@@ -43,8 +43,8 @@ public class Paciente extends Pessoa {
         return this.consultas;
     }
 
-    public void setConsultas(String consulta){
-        this.consultas.add(consulta);
+    public void setConsultas(Consulta consulta){
+        this.consultas.add(consulta.toString());
     }
 
     public List<String> getInternações(){
