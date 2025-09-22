@@ -71,4 +71,9 @@ public class Consulta {
     public void concluirConsulta(){
         this.status = "CONCLUIDA";
     }
+
+    @Override
+    public String toString(){
+        return medico.getNome() + ";" + getData() + ";" + getHora() + ";" + getLocal() + ";" + getStatus(); 
+    }
 }
