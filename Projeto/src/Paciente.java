@@ -55,4 +55,8 @@ public class Paciente extends Pessoa {
         this.internações.add(internação);
     }
 
+    @Override
+    public String toString(){
+        return String.format("Nome: %s, CPF: %s, Idade: %d, Historico de Consultas: %s, Historico de internações: %s", getNome(), cpf, idade, consultas, internações);
+    }
 }
