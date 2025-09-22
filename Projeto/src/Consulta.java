@@ -74,6 +74,6 @@ public class Consulta {
 
     @Override
     public String toString(){
-        return medico.getNome() + ";" + getData() + ";" + getHora() + ";" + getLocal() + ";" + getStatus(); 
+        return "[" + medico.getNome() + ";" + getData() + ";" + getHora() + ";" + getLocal() + ";" + getStatus() + "]"; 
     }
 }
