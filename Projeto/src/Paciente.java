@@ -1,14 +1,15 @@
 import java.util.List;
 import java.util.ArrayList;
 
-public class Paciente extends Pessoa {
+public class Paciente{
+    private String nome;
     private String cpf;
     private int idade;
     private List<String> consultas;
     private List<String> internações;
 
     public Paciente(){
-        super();
+        this.nome = "";
         this.cpf = "";
         this.idade = 0;
         this.consultas = new ArrayList<>();
@@ -16,11 +17,19 @@ public class Paciente extends Pessoa {
     }
 
     public Paciente(String nome, String cpf, int idade){
-        super(nome);
+        this.nome = nome;
         this.cpf = cpf;
         this.idade = idade;
         this.consultas = new ArrayList<>();
         this.internações = new ArrayList<>();
+    }
+
+    public String getNome(){
+        return this.nome;
+    }
+
+    public void setNome(String nome){
+        this.nome = nome;
     }
 
     public String getCPF(){

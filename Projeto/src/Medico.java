@@ -1,14 +1,15 @@
 import java.util.List;
 import java.util.ArrayList;
 
-public class Medico extends Pessoa{
+public class Medico{
+    private String nome;
     private String crm;
     private String especialidade;
     private double custoConsulta;
     private List<String> agenda;
 
     public Medico(){
-        super();
+        this.nome = "";
         this.crm = "";
         this.especialidade = "";
         this.custoConsulta = 0.0;
@@ -16,7 +17,7 @@ public class Medico extends Pessoa{
     }
 
     public Medico(String nome, String crm, String especialidade, double custo){//medico com especialidade
-        super(nome);
+        this.nome = nome;
         this.crm = crm;
         this.especialidade = especialidade;
         this.custoConsulta = custo;
@@ -24,11 +25,19 @@ public class Medico extends Pessoa{
     }
 
     public Medico(String nome, String crm, double custo){//medico sem especialidade
-        super(nome);
+        this.nome = nome;
         this.crm = crm;
         this.especialidade = "";
         this.custoConsulta = custo;
         this.agenda = new ArrayList<>();
+    }
+
+    public String getNome(){
+        return this.nome;
+    }
+
+    public void setNome(String nome){
+        this.nome = nome;
     }
 
     public String getCRM(){
