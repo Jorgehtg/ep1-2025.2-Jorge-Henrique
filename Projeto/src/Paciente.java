@@ -8,14 +8,6 @@ public class Paciente{
     private List<String> consultas;
     private List<String> internações;
 
-    public Paciente(){
-        this.nome = "";
-        this.cpf = "";
-        this.idade = 0;
-        this.consultas = new ArrayList<>();
-        this.internações = new ArrayList<>();
-    }
-
     public Paciente(String nome, String cpf, int idade){
         this.nome = nome;
         this.cpf = cpf;
@@ -53,7 +45,7 @@ public class Paciente{
     }
 
     public void setConsultas(Consulta consulta){
-        this.consultas.add(consulta.toString());
+        this.consultas.add(consulta.agendarConsulta());
     }
 
     public List<String> getInternações(){

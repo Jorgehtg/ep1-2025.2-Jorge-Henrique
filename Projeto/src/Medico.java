@@ -8,14 +8,6 @@ public class Medico{
     private double custoConsulta;
     private List<String> agenda;
 
-    public Medico(){
-        this.nome = "";
-        this.crm = "";
-        this.especialidade = "";
-        this.custoConsulta = 0.0;
-        this.agenda = new ArrayList<>();
-    }
-
     public Medico(String nome, String crm, String especialidade, double custo){//medico com especialidade
         this.nome = nome;
         this.crm = crm;

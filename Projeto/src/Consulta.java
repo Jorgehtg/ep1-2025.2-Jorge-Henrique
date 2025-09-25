@@ -1,3 +1,6 @@
+import java.util.ArrayList;
+import java.util.List;
+
 public class Consulta {
     private Paciente paciente;
     private Medico medico;
@@ -5,15 +8,8 @@ public class Consulta {
     private String hora;
     private String local;
     private String status;
-
-    public Consulta(){
-        this.paciente = null;
-        this.medico = null;
-        this.data = "";
-        this.hora = "";
-        this.local = "";
-        this.status = "AGENDADA"; //para ser criada a consulta tem que ser obrigatoriamente agendada 
-    }
+    private String diagnostico;
+    private List<Prescricao> prescrição;
 
     public Consulta(Paciente paciente, Medico medico, String data, String hora, String local){
         this.paciente = paciente;
@@ -21,7 +17,9 @@ public class Consulta {
         this.data = data;
         this.hora = hora;
         this.local = local;
-        this.status = "AGENDADA"; //mesma ideia da criação padrão
+        this.status = "AGENDADA"; //para ser criada a consulta tem que ser obrigatoriamente agendada
+        this.diagnostico = "";
+        this.prescrição = new ArrayList<>();
     }
 
     public Paciente getPaciente(){
@@ -60,20 +58,32 @@ public class Consulta {
         return this.status;
     }
 
-    public void agendarConsulta(){
-        this.status = "AGENDADA";
+    public String getDiagnostico(){
+        return this.diagnostico;
+    }
+
+    public void setDiagnostico(String diagnostico){
+        this.diagnostico = diagnostico;
+    }
+
+    public List<Prescricao> getPrescrição(){
+        return prescrição;
+    }
+
+    public void addPrescrição(Prescricao prescrição){
+        this.prescrição.add(prescrição);
+    }
+
+    public String agendarConsulta(){
+        return "[" + medico.getNome() + ";" + getData() + ";" + getHora() + ";" + getLocal() + ";" + getStatus() + "]";
     }
 
     public void cancelarConsulta(){
         this.status = "CANCELADA";
     }
 
-    public void concluirConsulta(){
+    public String concluirConsulta(){
         this.status = "CONCLUIDA";
-    }
-
-    @Override
-    public String toString(){
-        return "[" + medico.getNome() + ";" + getData() + ";" + getHora() + ";" + getLocal() + ";" + getStatus() + "]"; 
+        return "[" + medico.getNome() + ";" + getData() + ";" + getHora() + ";" + getLocal() + ";" + getStatus() + ";" + diagnostico + ";" + prescrição + "]";
     }
 }

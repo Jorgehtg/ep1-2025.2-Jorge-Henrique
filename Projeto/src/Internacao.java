@@ -6,14 +6,6 @@ public class Internacao {
     private int numQuarto;
     private double valorInternação;
 
-    public Internacao(){
-        this.paciente = null;
-        this.medico = null;
-        this.dataEntrada = "";
-        this.numQuarto = 0;
-        this.valorInternação = 0.0;
-    }
-
     public Internacao(Paciente paciente, Medico medico, String dataEntrada, int numQuarto, double valor){//paciente ainda não liberado
         this.paciente = paciente;
         this.medico = medico;

@@ -5,11 +5,6 @@ public class PlanoSaude {
     private String nome;
     private Map<String, Float> descontoEspecialidade;
 
-    public PlanoSaude(){
-        this.nome = "";
-        this.descontoEspecialidade = new HashMap<>();
-    }
-
     public PlanoSaude(String nome){
         this.nome = nome;
         this.descontoEspecialidade = new HashMap<>();
