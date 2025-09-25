@@ -6,14 +6,14 @@ public class Paciente{
     private String cpf;
     private int idade;
     private List<String> consultas;
-    private List<String> internações;
+    private List<String> internacoes;
 
     public Paciente(String nome, String cpf, int idade){
         this.nome = nome;
         this.cpf = cpf;
         this.idade = idade;
         this.consultas = new ArrayList<>();
-        this.internações = new ArrayList<>();
+        this.internacoes = new ArrayList<>();
     }
 
     public String getNome(){
@@ -24,11 +24,11 @@ public class Paciente{
         this.nome = nome;
     }
 
-    public String getCPF(){
+    public String getCpf(){
         return this.cpf;
     }
 
-    public void setCPF(String cpf){
+    public void setCpf(String cpf){
         this.cpf = cpf;
     }
 
@@ -48,16 +48,16 @@ public class Paciente{
         this.consultas.add(consulta.agendarConsulta());
     }
 
-    public List<String> getInternações(){
-        return internações;
+    public List<String> getInternacoes(){
+        return internacoes;
     }
 
-    public void setInternações(String internação){
-        this.internações.add(internação);
+    public void setInternacoes(String internação){
+        this.internacoes.add(internação);
     }
 
     @Override
     public String toString(){
-        return String.format("Nome: %s, CPF: %s, Idade: %d, Historico de Consultas: %s, Historico de internações: %s", getNome(), cpf, idade, consultas, internações);
+        return String.format("Nome: %s, CPF: %s, Idade: %d, Historico de Consultas: %s, Historico de internações: %s", getNome(), cpf, idade, consultas, internacoes);
     }
 }
