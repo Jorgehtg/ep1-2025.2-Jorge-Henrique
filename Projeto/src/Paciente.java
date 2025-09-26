@@ -5,6 +5,7 @@ public class Paciente{
     private String nome;
     private String cpf;
     private int idade;
+    private PlanoSaude plano;
     private List<String> consultas;
     private List<String> internacoes;
 
@@ -12,6 +13,7 @@ public class Paciente{
         this.nome = nome;
         this.cpf = cpf;
         this.idade = idade;
+        this.plano = new PlanoSaude(); //padrão que será alterado por outras classes
         this.consultas = new ArrayList<>();
         this.internacoes = new ArrayList<>();
     }
@@ -40,24 +42,32 @@ public class Paciente{
         this.idade = idade;
     }
 
+    public PlanoSaude getPlano(){
+        return this.plano;
+    }
+
+    public void setPlano(PlanoSaude plano){
+        this.plano = plano;
+    }
+
     public List<String> getConsultas(){
         return this.consultas;
     }
 
-    public void setConsultas(Consulta consulta){
-        this.consultas.add(consulta.agendarConsulta());
+    public void addConsultas(Consulta consulta){
+        this.consultas.add(consulta.consultaPaciente());
     }
 
     public List<String> getInternacoes(){
         return internacoes;
     }
 
-    public void setInternacoes(String internação){
+    public void addInternacoes(String internação){
         this.internacoes.add(internação);
     }
 
     @Override
     public String toString(){
-        return String.format("Nome: %s, CPF: %s, Idade: %d, Historico de Consultas: %s, Historico de internações: %s", getNome(), cpf, idade, consultas, internacoes);
+        return String.format("%s,%s,%s,%s,%s,%s", nome, cpf, idade, plano, consultas, internacoes);
     }
 }
