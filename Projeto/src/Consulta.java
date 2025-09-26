@@ -9,9 +9,9 @@ public class Consulta {
     private String local;
     private String status;
     private String diagnostico;
-    private List<Prescricao> prescrição;
+    private List<Prescricao> prescricao;
 
-    public Consulta(Paciente paciente, Medico medico, String data, String hora, String local){
+    public Consulta(Paciente paciente, Medico medico, String data, String hora, String local){//consulta apenas marcada
         this.paciente = paciente;
         this.medico = medico;
         this.data = data;
@@ -19,7 +19,18 @@ public class Consulta {
         this.local = local;
         this.status = "AGENDADA"; //para ser criada a consulta tem que ser obrigatoriamente agendada
         this.diagnostico = "";
-        this.prescrição = new ArrayList<>();
+        this.prescricao = null;
+    }
+
+    public Consulta(Paciente paciente, Medico medico, String data, String hora, String local, String diagnostico){//consulta concluida
+        this.paciente = paciente;
+        this.medico = medico;
+        this.data = data;
+        this.hora = hora;
+        this.local = local;
+        this.status = "CONCLUIDA";
+        this.diagnostico = diagnostico;
+        this.prescricao = new ArrayList<>();
     }
 
     public Paciente getPaciente(){
@@ -66,24 +77,22 @@ public class Consulta {
         this.diagnostico = diagnostico;
     }
 
-    public List<Prescricao> getPrescrição(){
-        return prescrição;
+    public List<Prescricao> getPrescricao(){
+        return prescricao;
     }
 
-    public void addPrescrição(Prescricao prescrição){
-        this.prescrição.add(prescrição);
+    public void addPrescricao(Prescricao prescrição){
+        if (!"CONCLUIDA".equals(this.status)){}
+        this.prescricao.add(prescrição);
     }
 
-    public String agendarConsulta(){
-        return "[" + medico.getNome() + ";" + getData() + ";" + getHora() + ";" + getLocal() + ";" + getStatus() + "]";
+    public String consultaPaciente(){
+        if (status.equals("CONCLUIDA")){
+            return String.format("[%s,%s,%s,%s,%s,%s,%s,%s]",medico.getNome(),medico.getCRM(), this.data, this.hora, this.local, this.status, this.diagnostico, prescricao);
+        }else{
+            return String.format("[%s,%s,%s,%s,%s,%s]", medico.getNome(),medico.getCRM(), this.data, this.hora, this.local, this.status);
+        }
     }
 
-    public void cancelarConsulta(){
-        this.status = "CANCELADA";
-    }
-
-    public String concluirConsulta(){
-        this.status = "CONCLUIDA";
-        return "[" + medico.getNome() + ";" + getData() + ";" + getHora() + ";" + getLocal() + ";" + getStatus() + ";" + diagnostico + ";" + prescrição + "]";
-    }
+    
 }
