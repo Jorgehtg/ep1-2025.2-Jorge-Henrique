@@ -19,7 +19,7 @@ public class Consulta {
         this.local = local;
         this.status = "AGENDADA"; //para ser criada a consulta tem que ser obrigatoriamente agendada
         this.diagnostico = "";
-        this.prescricao = null;
+        this.prescricao = new ArrayList<>();
     }
 
     public Consulta(Paciente paciente, Medico medico, String data, String hora, String local, String diagnostico){//consulta concluida
@@ -82,7 +82,9 @@ public class Consulta {
     }
 
     public void addPrescricao(Prescricao prescrição){
-        if (!"CONCLUIDA".equals(this.status)){}
+        if (!"CONCLUIDA".equals(this.status)){
+            return;
+        }
         this.prescricao.add(prescrição);
     }
 
