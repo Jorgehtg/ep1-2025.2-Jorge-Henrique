@@ -68,6 +68,6 @@ public class Paciente{
 
     @Override
     public String toString(){
-        return String.format("%s,%s,%s,%s,%s,%s", nome, cpf, idade, plano, consultas, internacoes);
+        return String.format("%s,%s,%s,%s,%s,%s", nome, cpf, idade, plano.getNome(), consultas, internacoes);
     }
 }

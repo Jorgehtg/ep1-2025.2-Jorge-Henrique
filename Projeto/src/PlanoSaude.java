@@ -7,8 +7,8 @@ public class PlanoSaude {
     private Map<String, Float> descontoEspecialidade;
 
     public PlanoSaude(){
-        this.nome = "";
-        this.tipo = "PARTICULAR";
+        this.nome = "PARTICULAR";
+        this.tipo = "";
         this.descontoEspecialidade = new HashMap<>();
     }
 
