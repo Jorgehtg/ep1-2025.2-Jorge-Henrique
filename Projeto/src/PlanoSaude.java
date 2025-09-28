@@ -4,11 +4,11 @@ import java.util.HashMap;
 public class PlanoSaude {
     private String nome;
     private String tipo;
-    private Map<String, Float> descontoEspecialidade;
+    protected Map<String, Float> descontoEspecialidade;
 
-    public PlanoSaude(){
+    public PlanoSaude(){//criação padrão para escrever no arquivo de quem não tem plano
         this.nome = "PARTICULAR";
-        this.tipo = "";
+        this.tipo = "PARTICULAR";
         this.descontoEspecialidade = new HashMap<>();
     }
 
@@ -34,15 +34,16 @@ public class PlanoSaude {
         this.tipo = tipo;
     }
 
-    public float getDescontoEspecialidade(String especialidade){
-        if(tipo.equalsIgnoreCase("PARTICULAR")){
-            return 0.0f;
-        }
-        return descontoEspecialidade.getOrDefault(especialidade, 0.0f);
+    public Map<String, Float> getDescontoEspecialidade(){
+        return this.descontoEspecialidade;
     }
 
     public void setDescontoEspecialidade(String especialidade, float desconto){
-        descontoEspecialidade.put(especialidade, desconto); 
+        if(nome.equalsIgnoreCase("PARTICULAR")){
+            descontoEspecialidade.put(especialidade,0.0f);
+        }else{
+            descontoEspecialidade.put(especialidade, desconto);
+        }
     }
 
 }    
