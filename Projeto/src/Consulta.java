@@ -82,14 +82,15 @@ public class Consulta {
     }
 
     public void addPrescricao(Prescricao prescrição){
-        if (!"CONCLUIDA".equals(this.status)){
+        if (!"CONCLUIDA".equalsIgnoreCase
+        (this.status)){
             return;
         }
         this.prescricao.add(prescrição);
     }
 
     public String consultaPaciente(){
-        if (status.equals("CONCLUIDA")){
+        if (status.equalsIgnoreCase("CONCLUIDA")){
             return String.format("[%s,%s,%s,%s,%s,%s,%s,%s]",medico.getNome(),medico.getCRM(), this.data, this.hora, this.local, this.status, this.diagnostico, prescricao);
         }else{
             return String.format("[%s,%s,%s,%s,%s,%s]", medico.getNome(),medico.getCRM(), this.data, this.hora, this.local, this.status);
