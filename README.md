@@ -10,10 +10,10 @@ Desenvolvimento de um sistema de gerenciamento hospitalar utilizando os conceito
 
 ## Dados do Aluno
 
-- **Nome completo:** [Preencher aqui]
-- **Matrícula:** [Preencher aqui]
-- **Curso:** [Preencher aqui]
-- **Turma:** [Preencher aqui]
+- **Nome completo:** [Jorge Henrique Torres Gargalhone]
+- **Matrícula:** [242023990]
+- **Curso:** [Engenharias]
+- **Turma:** [02]
 
 ---
 
@@ -52,8 +52,6 @@ Desenvolvimento de um sistema de gerenciamento hospitalar utilizando os conceito
 
 ---
 
----
-
 ## Observações (Extras ou Dificuldades)
 
 - [Espaço para o aluno comentar qualquer funcionalidade extra que implementou, dificuldades enfrentadas, ou considerações importantes.]
@@ -62,7 +60,7 @@ Desenvolvimento de um sistema de gerenciamento hospitalar utilizando os conceito
 
 ## Contato
 
-- [Opcional: E-mail pessoal do aluno.]
+- [jgargalhone@gmail.com]
 
 ---
 
