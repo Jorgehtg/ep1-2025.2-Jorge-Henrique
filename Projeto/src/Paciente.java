@@ -66,8 +66,12 @@ public class Paciente{
         this.internacoes.add(internação);
     }
 
+    public boolean isIdoso(){
+        return this.idade >= 60;
+    }
+
     @Override
     public String toString(){
-        return String.format("%s,%s,%s,%s,%s,%s", nome, cpf, idade, plano.getNome(), consultas, internacoes);
+        return String.format("%s,%s,%d,%s,%s,%s", nome, cpf, idade, plano.getNome(), consultas, internacoes);
     }
 }
