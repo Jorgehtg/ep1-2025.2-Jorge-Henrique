@@ -19,7 +19,7 @@ public class Medico{
     public Medico(String nome, String crm, double custo){//medico sem especialidade
         this.nome = nome;
         this.crm = crm;
-        this.especialidade = "";
+        this.especialidade = "Clinico Geral";
         this.custoConsulta = custo;
         this.agenda = new ArrayList<>();
     }
