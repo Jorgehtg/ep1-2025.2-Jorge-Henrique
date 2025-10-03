@@ -5,20 +5,21 @@ public class Main {
 
     static ArrayList<Paciente> pacientes = new ArrayList<>();
     static ArrayList<Medico> medicos = new ArrayList<>();
-    static ArrayList<String> especialidades = new ArrayList<>();
-    static ArrayList<String> planos = new ArrayList<>();
     static ArrayList<String> gerais = new ArrayList<>();
+    static ArrayList<String> especialidades = new ArrayList<>();
+    static ArrayList<PlanoSaude> planos = new ArrayList<>();
     static ArrayList<String> cpfs = new ArrayList<>();
 
     public static void main(String[] args) {
         Scanner input = new Scanner(System.in);
 
         while (true) {
-            System.out.println("GERENCIAMENTO HOSPITALAR");
+            System.out.println("========= GERENCIAMENTO HOSPITALAR =========");
             System.out.println("Modo Paciente - 1");
             System.out.println("Modo Medico - 2");
             System.out.println("Modo Administrativo - 3");
             System.out.println("Sair - 0");
+            System.out.println("============================================");
 
             int valor = input.nextInt();
             input.nextLine();
@@ -45,7 +46,7 @@ public class Main {
 
     public static void ModoPaciente(Scanner input) {
         while (true) {
-            System.out.println("============= MODO PACIENTE ==============");
+            System.out.println("============== MODO PACIENTE ===============");
             System.out.println("Cadastrar paciente - 1");
             System.out.println("Marcar atendimento - 2");
             System.out.println("Cancelar atendimento - 3");
@@ -64,19 +65,14 @@ public class Main {
                     break;
                 case 2:
                     MarcarAtendimento(input);
-                    System.out.println("Atendimento marcado");
                     break;
                 case 3:
-                    System.out.println("Atendimento cancelado");
                     return;
                 case 4:
-                    System.out.println("Atendimentos");
                     return;
                 case 5:
-                    System.out.println("Histórico Consultas");
                     return;
                 case 6:
-                    System.err.println("Historico Internações");
                     return;
                 case 0:
                     return;
@@ -87,19 +83,45 @@ public class Main {
     }
 
     public static void CadastrarPaciente(Scanner input){
+        System.out.println("===========================================");
         System.out.print("Digite o nome do paciente: ");
         String nome = input.nextLine();
 
-        System.out.print("Digite o cpf do paciente: ");
-        String cpf = input.nextLine();
-        if(cpfs.contains(cpf)){
-            System.out.println("Paciente já cadastrado");
-            return;
-        }
+        System.out.print("Digite o cpf do paciente (formato 000000000-00): ");
+        String cpf = "";
+        do{
+            cpf = input.nextLine();
+            if(!cpf.matches("\\d{9}-\\d{2}")){ 
+                System.out.println("Formato invalido! Use: 000000000-00");
+                continue;
+                }else{
+                    if(cpfs.contains(cpf)){
+                        System.out.println("Paciente já cadastrado");
+                        return;
+                    }
+                    break;
+                }
+        }while (true);
 
-        System.out.print("Digite a idade do paciente: ");
-        int idade = input.nextInt();
-        input.nextLine();
+        int idade = 0;
+        do {
+            System.out.print("Digite a idade do paciente: ");
+            
+            if (input.hasNextInt()) {
+                idade = input.nextInt();
+                input.nextLine(); // Limpa o buffer
+                
+                // Verifica se a idade está em um range razoável
+                if (idade >= 0) {
+                    break;
+                } else {
+                    System.out.println("Digite um valor positivo");
+                }
+            } else {
+                System.out.println("Digite apenas números para a idade!");
+                input.nextLine();
+            }
+        }while (true);
         
         do{
             System.out.println("Tem plano de saúde? [S/N]");
@@ -116,6 +138,7 @@ public class Main {
                 System.out.println("Digite uma resposta valida!");
             } 
         } while(true);
+        System.out.println("===========================================\n");
     }
 
     public static void MarcarAtendimento(Scanner input){

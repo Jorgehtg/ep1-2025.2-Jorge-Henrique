@@ -20,7 +20,7 @@ public class PlanoSaude {
         this.nome = nome;
         this.tipo = tipo;
         if(!nome.equalsIgnoreCase("PARTICULAR")){
-            this.especialidades = new ArrayList();
+            this.especialidades = new ArrayList<>();
             this.descontoEspecialidade = new ArrayList<>();
             this.descontoIdoso = new ArrayList<>();
             this.descontoInternacao = desconto;
