@@ -64,8 +64,25 @@ public class Medico{
         this.agenda.add(atendimento.consultaMedico());
     }
 
-    public void removeHorario(String hora){
-        this.agenda.remove(hora);
+    public void removeHorario(String horarioRemover){
+        this.agenda.remove(horarioRemover);
+    }
+
+    public boolean isHorarioLivre(String data, String hora){
+            if (agenda == null || agenda.isEmpty()){
+                return true;
+            }
+            for (String atendimentos: agenda){
+                String[] dados = atendimentos.split(";");
+
+                String dataOcupada = dados[1].trim();
+                String horaOcupada = dados[2].trim();
+
+                if (dataOcupada.equalsIgnoreCase(data) && horaOcupada.equalsIgnoreCase(hora)){
+                    return false;
+                } 
+            }
+            return true;
     }
 
 }
