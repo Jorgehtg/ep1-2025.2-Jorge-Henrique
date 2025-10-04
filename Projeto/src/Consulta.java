@@ -91,11 +91,15 @@ public class Consulta {
 
     public String consultaPaciente(){
         if (status.equalsIgnoreCase("CONCLUIDA")){
-            return String.format("[%s,%s,%s,%s,%s,%s,%s,%s,%d]",medico.getNome(),medico.getCRM(), this.data, this.hora, this.local, this.status, this.diagnostico, prescricao, medico.getCustoConsulta());
+            return String.format("[Dr: %s,%s,%s,%s,%s,%s,%s,%s,%d]",medico.getNome(),medico.getCRM(), this.data, this.hora, this.local, this.status, this.diagnostico, prescricao, medico.getCustoConsulta());
         }else{
             return String.format("[%s,%s,%s,%s,%s,%s]", medico.getNome(),medico.getCRM(), this.data, this.hora, this.local, this.status);
         }
     }
+
+    public String consultaMedico(){
+            return String.format("%s; %s; %s; %s", paciente.getNome(), this.data, this.hora, this.local);
+        }
 
     
 }

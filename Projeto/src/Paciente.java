@@ -6,7 +6,7 @@ public class Paciente{
     private String cpf;
     private int idade;
     private PlanoSaude plano;
-    private List<String> consultas;
+    private List<Consulta> consultas;
     private List<String> internacoes;
 
     public Paciente(String nome, String cpf, int idade){
@@ -50,12 +50,12 @@ public class Paciente{
         this.plano = plano;
     }
 
-    public List<String> getConsultas(){
+    public List<Consulta> getConsultas(){
         return this.consultas;
     }
 
     public void addConsultas(Consulta consulta){
-        this.consultas.add(consulta.consultaPaciente());
+        this.consultas.add(consulta);
     }
 
     public List<String> getInternacoes(){
@@ -70,8 +70,14 @@ public class Paciente{
         return this.idade >= 60;
     }
 
+    public double calcularCustoConsulta(double precoOriginal, String especialidade){
+        return precoOriginal;
+    }
+
     @Override
     public String toString(){
         return String.format("%s,%s,%d,%s,%s,%s", nome, cpf, idade, plano.getNome(), consultas, internacoes);
     }
+
+    
 }
