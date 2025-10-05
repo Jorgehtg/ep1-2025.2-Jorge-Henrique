@@ -88,5 +88,11 @@ public class Medico{
             }
             return true;
     }
+    
+    //escrever no arquivo dos medicos
+    @Override
+    public String toString(){
+        return String.format("%s,%s,%s,%.2f,%s", nome, crm, especialidade, custoConsulta, agenda);
+    }
 
 }
