@@ -89,6 +89,12 @@ public class Consulta {
         this.prescricao = prescrição;
     }
 
+    public void concluirConsulta(String diagnostico, Prescricao prescricao){
+        this.diagnostico = diagnostico;
+        this.prescricao = prescricao;
+
+    }
+
     public String consultaPaciente(){
         if (status.equalsIgnoreCase("CONCLUIDA")){
             return String.format("[Dr. %s,%s,%s,%s,%s,%s,%s,%s,%d]",medico.getNome(),medico.getCRM(), this.data, this.hora, this.local, this.status, this.diagnostico, prescricao, medico.getCustoConsulta());
