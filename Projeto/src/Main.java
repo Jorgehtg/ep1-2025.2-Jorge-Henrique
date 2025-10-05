@@ -5,6 +5,7 @@
     import java.util.ArrayList;
     import java.util.List;
     import java.util.Scanner;
+    import java.util.Locale;
 
     public class Main{
         
@@ -675,15 +676,71 @@
 
                 switch (valor){
                     case 1:
-                        System.out.println("Medico cadastrado");
+                        cadastrarMedico(input);
                         break;
                     case 2:
                         System.out.println("Consulta concluida");
                         break;
+                    case 3:
+                        break;
+                    case 4:
+                        break;
+                    case 5:
+                        break;
+                    case 6:
+                        break;
+                    case 7:
+                        break;
                     case 0:
                         return;
+                    default:
+                        System.out.println("Digite uma opção valida");
                 }
             }
+        }
+
+        public static void cadastrarMedico(Scanner input){
+            System.out.print("Digite o nome do medico: ");
+            String nome = input.nextLine();
+
+            System.out.print("Digite o CRM do medico: ");
+            String crm = input.nextLine();
+
+            System.out.println("O medico tem especialidade? [S/N]");
+            String res1 = input.nextLine();
+
+            if (res1.equalsIgnoreCase("S")){
+                System.out.print("Digite a especialidade: ");
+                String especialidade = input.nextLine();
+
+                System.out.print("Digite o custo da consulta (no formato de um decimal 000.00): ");
+                input.useLocale(Locale.US);
+                double custoConsulta = input.nextDouble();
+                input.nextLine();
+
+                Medico medico = new Medico(nome, crm, especialidade, custoConsulta);
+
+                medicos.add(medico);
+                if (!especialidades.contains(especialidade)){
+                    especialidades.add(especialidade);
+                }
+                salvarMedico(medico);
+            }else if (res1.equalsIgnoreCase("N")){
+                System.out.print("Digite o custo da consulta (no formato de um decimal 000.00): ");
+                input.useLocale(Locale.US);
+                double custoConsulta = input.nextDouble();
+                input.nextLine();
+
+                String especialidade = "clinico geral";
+                Medico medico = new Medico(nome, crm, custoConsulta);
+
+                medicos.add(medico);
+                if (!especialidades.contains(especialidade)){
+                    especialidades.add(especialidade);
+                }
+                salvarMedico(medico);
+            }
+            
         }
 
         public static void salvarPaciente(Paciente paciente){ 
@@ -700,6 +757,15 @@
             } catch(IOException erro){
                 System.out.println("Erro: " + erro.getMessage());
             }
+        }
+
+        public static void salvarMedico(Medico medico){
+            try{
+                Files.write(Paths.get("Dados/Medicos.csv"), ("\n" + medico.toString()).getBytes(), StandardOpenOption.APPEND);
+            } catch(IOException erro){
+                System.out.println("Erro: " + erro.getMessage());
+            }
+        
         }
 
         public static void carregarPacientesECpfs(){
@@ -730,7 +796,7 @@
 
                 for (int i = 1; i < linhas.size(); i++){
                     String linha = linhas.get(i);
-                    String[] dados = linha.split(",");
+                    String[] dados = linha.split(",", 5);
 
                     double custoConsulta = Double.parseDouble(dados[3].trim());
                     
