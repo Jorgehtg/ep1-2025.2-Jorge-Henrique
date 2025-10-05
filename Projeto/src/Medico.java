@@ -65,7 +65,7 @@ public class Medico{
     }
 
     public void removerAtendimento(Consulta consulta){
-        this.agenda.remove(consulta);
+        this.agenda.remove(consulta.consultaMedico());
     }
 
     public void removeHorario(String horarioRemover){
