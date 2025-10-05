@@ -1,6 +1,3 @@
-import java.util.ArrayList;
-import java.util.List;
-
 public class Consulta {
     private Paciente paciente;
     private Medico medico;
@@ -9,7 +6,7 @@ public class Consulta {
     private String local;
     private String status;
     private String diagnostico;
-    private List<Prescricao> prescricao;
+    private Prescricao prescricao;
 
     public Consulta(Paciente paciente, Medico medico, String data, String hora, String local){//consulta apenas marcada
         this.paciente = paciente;
@@ -19,10 +16,10 @@ public class Consulta {
         this.local = local;
         this.status = "AGENDADA"; //para ser criada a consulta tem que ser obrigatoriamente agendada
         this.diagnostico = "";
-        this.prescricao = new ArrayList<>();
+        this.prescricao = null;
     }
 
-    public Consulta(Paciente paciente, Medico medico, String data, String hora, String local, String diagnostico){//consulta concluida
+    public Consulta(Paciente paciente, Medico medico, String data, String hora, String local, String diagnostico, Prescricao prescricao){//consulta concluida
         this.paciente = paciente;
         this.medico = medico;
         this.data = data;
@@ -30,7 +27,7 @@ public class Consulta {
         this.local = local;
         this.status = "CONCLUIDA";
         this.diagnostico = diagnostico;
-        this.prescricao = new ArrayList<>();
+        this.prescricao = prescricao;
     }
 
     public Paciente getPaciente(){
@@ -77,29 +74,36 @@ public class Consulta {
         this.diagnostico = diagnostico;
     }
 
-    public List<Prescricao> getPrescricao(){
+    public Prescricao getPrescricao(){
         return prescricao;
     }
 
-    public void addPrescricao(Prescricao prescrição){
-        if (!"CONCLUIDA".equalsIgnoreCase
-        (this.status)){
-            return;
+    public void setPrescricao(Prescricao prescrição){
+        if (!"CONCLUIDA".equalsIgnoreCase(this.status)){
+            this.prescricao = null;
         }
-        this.prescricao.add(prescrição);
+        this.prescricao = prescrição;
     }
 
     public String consultaPaciente(){
         if (status.equalsIgnoreCase("CONCLUIDA")){
-            return String.format("[Dr: %s,%s,%s,%s,%s,%s,%s,%s,%d]",medico.getNome(),medico.getCRM(), this.data, this.hora, this.local, this.status, this.diagnostico, prescricao, medico.getCustoConsulta());
+            return String.format("[Dr. %s,%s,%s,%s,%s,%s,%s,%s,%d]",medico.getNome(),medico.getCRM(), this.data, this.hora, this.local, this.status, this.diagnostico, prescricao, medico.getCustoConsulta());
         }else{
-            return String.format("[%s,%s,%s,%s,%s,%s]", medico.getNome(),medico.getCRM(), this.data, this.hora, this.local, this.status);
+            return String.format("[Dr. %s,%s,%s,%s,%s,%s]", medico.getNome(),medico.getCRM(), this.data, this.hora, this.local, this.status);
         }
     }
 
     public String consultaMedico(){
-            return String.format("%s; %s; %s; %s", paciente.getNome(), this.data, this.hora, this.local);
+        return String.format("%s; %s; %s; %s", paciente.getNome(), this.data, this.hora, this.local);
+    }
+
+    @Override
+    public String toString(){
+        if (!status.equalsIgnoreCase("CONCLUIDA")){
+            return String.format("%s,%s,%s,%s,%s,%s", paciente.getNome(), medico.getNome(), data, hora, local, status);
         }
+        return String.format("%s,%s,%s,%s,%s,%s,%s,%s", paciente.getNome(), medico.getNome(), data, hora, local, status, diagnostico, prescricao.prescricaoConsulta());
+    }
 
     
 }

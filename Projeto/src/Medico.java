@@ -60,8 +60,12 @@ public class Medico{
         return agenda;
     }
 
-    public void addAtendimento(Consulta atendimento){
-        this.agenda.add(atendimento.consultaMedico());
+    public void addAtendimento(Consulta consulta){
+        this.agenda.add(consulta.consultaMedico());
+    }
+
+    public void removerAtendimento(Consulta consulta){
+        this.agenda.remove(consulta);
     }
 
     public void removeHorario(String horarioRemover){

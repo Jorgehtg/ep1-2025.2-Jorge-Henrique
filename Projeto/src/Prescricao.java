@@ -29,6 +29,10 @@ public class Prescricao{
         this.dias = dias;
     }
 
+    public String prescricaoConsulta(){
+        return String.format("%s por %d dias", remedio, dias);
+    }
+
     @Override
     public String toString(){
         return "Prescrição: " + medico.getNome() + "(CRM: " + medico.getCRM() + ") " + remedio;
