@@ -83,17 +83,30 @@
                         System.out.println("============================================\n");
                         break;
                     case 2:
+                        System.out.println("============================================");
                         marcarAtendimento(input);
+                        System.out.println("============================================\n");
                         break;
                     case 3:
+                        System.out.println("============================================");
                         cancelarAtendimento(input);
+                        System.out.println("============================================\n");
                         break;
                     case 4:
-                        return;
+                        System.out.println("============================================");
+                        checarAtendimentosMarcados(input);
+                        System.out.println("============================================\n");
+                        break;
                     case 5:
-                        return;
+                        System.out.println("============================================");
+                        checarHistoricoConsultas(input);
+                        System.out.println("============================================\n");
+                        break;
                     case 6:
-                        return;
+                        System.out.println("============================================");
+                        checarHistoricoInternacoes(input);
+                        System.out.println("============================================\n");
+                        break;
                     case 0:
                         return;
                     default:
@@ -145,12 +158,12 @@
             
             while (true){
                 System.out.println("Tem plano de saúde? [S/N]");
-                String res = input.nextLine().toUpperCase();
+                String res1 = input.nextLine().toUpperCase();
 
-                if (res.equalsIgnoreCase("S")){
+                if (res1.equalsIgnoreCase("S")){
                     while (true){
                         System.out.println("Qual o nome do seu plano?");
-                        String nomePlano = input.nextLine();
+                        String nomePlano = input.nextLine().toLowerCase();
 
                         if (nomePlanos.contains(nomePlano)){
                             PlanoSaude plano = buscarPlanoPeloNome(nomePlano);
@@ -165,11 +178,11 @@
                             return;
                         } else{
                             System.out.println("Parece que não trabalhamos com esse plano, gostaria de tentar outro? [S/N]");
-                            String res1 = input.nextLine();
+                            String res2 = input.nextLine();
 
-                            if (res1.equalsIgnoreCase("S")){
+                            if (res2.equalsIgnoreCase("S")){
                                 continue;
-                            } else if (res1.equalsIgnoreCase("N")){
+                            } else if (res2.equalsIgnoreCase("N")){
                                 Paciente paciente = new Paciente(nome, cpf, idade);
                                 
                                 pacientes.add(paciente);
@@ -183,7 +196,7 @@
                             }
                         }
                     }
-                } else if (res.equals("N")){
+                } else if (res1.equals("N")){
                     Paciente p = new Paciente(nome, cpf, idade);
                     
                     pacientes.add(p);
@@ -193,58 +206,48 @@
                     System.out.println("Paciente cadastrado");
                     return;
                 } else{
-                    System.out.println("Digite uma resposta valida!");
+                    System.out.println("Por favor digite S ou N");
                 } 
             }
         }
 
         public static void marcarAtendimento(Scanner input) {
-            System.out.print("Digite seu CPF: ");
-            String cpf = "";
-
-            while (true) {
-                cpf = input.nextLine();
-
-                if (!cpf.matches("\\d{9}-\\d{2}")){ 
-                    System.out.println("Formato invalido! Use: 000000000-00");
-                    continue;
-                }
-                break;
-            }
-
-            if(!cpfs.contains(cpf)) {
-                System.out.println("Desculpa! Não encontramos seu cpf! Gostaria de se cadastrar? [S/N]");
-                String res1 = input.nextLine();
-                
-                if (res1.equalsIgnoreCase("S")){
-                    cadastrarPaciente(input);
-                }
-                return;
-            }
+            String cpf = validadorCpf(input);
 
             Paciente paciente = buscarPacientePorCpf(cpf);
+
+            if (paciente != null){
             
-            while (true){
-                System.out.println("Alguma especialidade em especifico? [S/N]");
-                String res2 = input.nextLine(); 
-                
-                Medico medico = null;    
+                while (true){
+                    System.out.println("Alguma especialidade em especifico? [S/N]");
+                    String res2 = input.nextLine(); 
+                    
+                    Medico medico = null;    
 
-                if (res2.equalsIgnoreCase("S")){
-                    while (true){
-                        System.out.println("Qual especialidade?");
-                        String especialidade = input.nextLine();
-                        
-                        if (especialidades.contains(especialidade)){
-                            List<Medico> medicosEspecialidade = mostrarMedicosNumerados(especialidade);
-
-                            while (true){
-                                System.out.println("Qual médico você gostaria? (Digite o número)");
+                    if (res2.equalsIgnoreCase("S")){
+                        while (true){
+                            System.out.println("Qual especialidade?");
+                            String especialidade = input.nextLine().toLowerCase();
                             
-                                try{
+                            if (especialidades.contains(especialidade)){
+                                List<Medico> medicosEspecialidade = mostrarMedicosNumerados(especialidade);
+
+                                while (true){
+                                    System.out.println("Qual médico você gostaria? (Digite o número ou 0 para cancelar operação)");
+                                 
+                                    if (!input.hasNextInt()) {
+                                        System.out.println("Por favor, digite um número válido.");
+                                        input.nextLine();
+                                        continue;
+                                    }
+                                    
                                     int numeroMedico = input.nextInt();
                                     input.nextLine();
-                                
+
+                                    if (numeroMedico == 0){
+                                        return;
+                                    }
+
                                     if (numeroMedico >= 1 && numeroMedico <= medicosEspecialidade.size()){
                                         medico = medicosEspecialidade.get(numeroMedico - 1);
                                         Consulta consulta = registrarConsulta(input, medico, paciente);
@@ -253,128 +256,130 @@
                                             return;
                                         }
                                         break;
+                                    } else if(numeroMedico == 0){
+                                        return;
                                     } else{
                                         System.out.println("Número inválido! Tente novamente.");
                                     }
-                                } catch (Exception e){
-                                    System.out.println("Erro: " + e.getMessage());
-                                    input.nextLine();
+                                }
+                            } else{
+                                while (true){
+                                    System.out.println("Desculpa, ainda não temos essa especialidade! Alguma outra? [S/N]");
+                                    String res3 = input.nextLine();
+
+                                    if (res3.equalsIgnoreCase("S")){
+                                        break;
+                                    } else if (res3.equalsIgnoreCase("N")){
+                                        System.out.println("Gostaria de marcar com um clinico geral? [S/N]");
+                                        String res4 = input.nextLine();
+
+                                        if (res4.equalsIgnoreCase("S")){
+                                            List<Medico> medicosClinico = mostrarMedicosNumerados("Clinico Geral");
+                                            
+                                            if (!medicosClinico.isEmpty()) {
+                                                System.out.println("Qual médico você gostaria? (Digite o número ou 0 para cancelar a operação)");
+
+                                                    if (!input.hasNextInt()) {
+                                                        System.out.println("Por favor, digite um número válido.");
+                                                        input.nextLine();
+                                                        continue;
+                                                    }
+
+                                                    int numeroMedico = input.nextInt();
+                                                    input.nextLine();
+
+                                                    if (numeroMedico == 0){
+                                                        return;
+                                                    }
+                                                    
+                                                    if (numeroMedico >= 1 && numeroMedico <= medicosClinico.size()) {
+                                                        medico = medicosClinico.get(numeroMedico - 1);
+                                                        Consulta consulta = registrarConsulta(input, medico, paciente);
+                                                        if (consulta != null) {
+                                                            System.out.printf("Atendimento marcado para dia %s às %s com Dr. %s\n", consulta.getData(), consulta.getHora(), medico.getNome());
+                                                            return;
+                                                        }
+                                                    } else {
+                                                        System.out.println("Número inválido!");
+                                                    }
+                                            }
+                                            break;
+                                        } else if(res4.equalsIgnoreCase("N")){
+                                        return;
+                                        } else{
+                                        System.out.println("Por favor digite S ou N");
+                                        }
+                                    } else{
+                                        System.out.println("Por favor digite S ou N");
+                                    }
                                 }
                             }
-                        } else{
-                            System.out.println("Desculpa, ainda não temos essa especialidade! Alguma outra? [S/N]");
-                            String res4 = input.nextLine();
+                        }
+                    } else if (res2.equalsIgnoreCase("N")){
+                        List<Medico> medicosClinico = mostrarMedicosNumerados("Clinico Geral");
+                        
+                        if (!medicosClinico.isEmpty()){
+                            while (true){
+                                System.out.println("Qual médico você gostaria? (Digite o número ou 0 para cancelar a operação)");
 
-                            if (res4.equalsIgnoreCase("S")){
-                                continue;
-                            } else if (res4.equalsIgnoreCase("N")){
-                                System.out.println("Gostaria de marcar com um clinico geral? [S/N]");
-                                String res5 = input.nextLine();
+                                if (!input.hasNextInt()) {
+                                    System.out.println("Por favor, digite um número válido.");
+                                    input.nextLine();
+                                    continue;
+                                }
 
-                                if (res5.equalsIgnoreCase("S")){
-                                    List<Medico> medicosClinico = mostrarMedicosNumerados("Clinico Geral");
-                                    
-                                    if (!medicosClinico.isEmpty()) {
-                                        System.out.println("Qual médico você gostaria? (Digite o número)");
-                                        try {
-                                            int numeroMedico = input.nextInt();
-                                            input.nextLine();
-                                            
-                                            if (numeroMedico >= 1 && numeroMedico <= medicosClinico.size()) {
-                                                medico = medicosClinico.get(numeroMedico - 1);
-                                                Consulta consulta = registrarConsulta(input, medico, paciente);
-                                                if (consulta != null) {
-                                                    System.out.printf("Atendimento marcado para dia %s às %s com Dr. %s\n", consulta.getData(), consulta.getHora(), medico.getNome());
-                                                    return;
-                                                }
-                                            } else {
-                                                System.out.println("Número inválido!");
-                                            }
-                                        } catch (Exception e) {
-                                            System.out.println("Por favor, digite um número válido.");
-                                            input.nextLine();
-                                            continue;
-                                        }
+                                int numeroMedico = input.nextInt();
+                                input.nextLine();
+
+                                if (numeroMedico == 0){
+                                    return;
+                                }
+                                
+                                if (numeroMedico >= 1 && numeroMedico <= medicosClinico.size()) {
+                                    medico = medicosClinico.get(numeroMedico - 1);
+                                    Consulta consulta = registrarConsulta(input, medico, paciente);
+                                    if (consulta != null){
+                                        System.out.printf("Atendimento marcado para dia %s às %s com Dr. %s\n", consulta.getData(), consulta.getHora(), medico.getNome());
+                                        return;
                                     }
                                     break;
-                                } else if(res5.equalsIgnoreCase("N")){
+                                } else if(numeroMedico == 0){
                                     return;
                                 } else{
-                                    System.out.println("Digite S ou N");
+                                    System.out.println("Número inválido!");
                                 }
-                            } else {
-                                System.out.println("Digite uma resposta valida");
                             }
                         }
+                    } else {
+                        System.out.println("Por favor digite S ou N");
                     }
-                } else if (res2.equalsIgnoreCase("N")){
-                    List<Medico> medicosClinico = mostrarMedicosNumerados("Clinico Geral");
-                    
-                    if (!medicosClinico.isEmpty()){
-                        while (true){
-                            System.out.println("Qual médico você gostaria? (Digite o número)");
-
-                            if (!input.hasNextInt()) {
-                                System.out.println("Por favor, digite um número válido.");
-                                input.nextLine();
-                                continue;
-                            }
-
-                            int numeroMedico = input.nextInt();
-                            input.nextLine();
-                            
-                            if (numeroMedico >= 1 && numeroMedico <= medicosClinico.size()) {
-                                medico = medicosClinico.get(numeroMedico - 1);
-                                Consulta consulta = registrarConsulta(input, medico, paciente);
-                                if (consulta != null){
-                                    System.out.printf("Atendimento marcado para dia %s às %s com Dr. %s\n", consulta.getData(), consulta.getHora(), medico.getNome());
-                                    return;
-                                }
-                                break;
-                            } else{
-                                System.out.println("Número inválido!");
-                            }
-                        }
-                    }
-                } else {
-                    System.out.println("Digite S ou N");
                 }
+            } else{
+                System.out.println("Paciente invalido");
+                return;
             }
         }
 
         public static void cancelarAtendimento(Scanner input){
-            System.out.print("Digite seu cpf: ");
-            String cpf = "";
+            String cpf = validadorCpf(input);
 
-            while (true) {
-                cpf = input.nextLine();
-
-                if (!cpf.matches("\\d{9}-\\d{2}")){ 
-                    System.out.println("Formato invalido! Use: 000000000-00");
-                    continue;
-                }
-                break;
-            }
-
-            if(!cpfs.contains(cpf)) {
-                System.out.println("Desculpa! Não encontramos seu cpf! Gostaria de se cadastrar? [S/N]");
-                String res1 = input.nextLine();
-                
-                if (res1.equalsIgnoreCase("S")){
-                    cadastrarPaciente(input);
-                }
-                return;
-            }
+            List<Consulta> consultasPaciente = new ArrayList<>();
 
             for (int i = 0; i < consultas.size(); i ++){
                 Consulta consulta = consultas.get(i);
                 if (consulta.getPaciente().getCpf().equalsIgnoreCase(cpf) && consulta.getStatus().equalsIgnoreCase("AGENDADA")){
                     System.out.printf("%d. Dr. %s - Dia %s às %s\n", i+1, consulta.getMedico().getNome(), consulta.getData(), consulta.getHora());
+                    consultasPaciente.add(consulta);
                 }
             }
 
+            if (consultasPaciente.isEmpty()){
+                System.out.println("Sem consultas marcadas");
+                return;
+            }
+
             while (true){
-                System.out.println("Qual dessas deseja cancelar? (0 para finalizar operação)");
+                System.out.println("Qual dessas deseja cancelar? (0 para cancelar operação)");
                 if (!input.hasNextInt()){
                     System.out.println("Digite um numero valido");
                     input.nextLine();
@@ -394,45 +399,91 @@
                     //atualizarArquivoConsultas();
                     
                     System.out.println("Consulta cancelada com sucesso!");
+                    return;
+                } else{
+                    System.out.println("Digite um numero valido");
                 }
-
-                
             }
-
-
-            
-            
         }
 
+        public static void checarAtendimentosMarcados(Scanner input){
+            String cpf = validadorCpf(input);
+            boolean temConsultas = false;
 
-
-        public static void modoMedico(Scanner input){
-            while(true){
-                System.out.println("=============== MODO MEDICO ================");
-                System.out.println("Cadastrar Medico - 1");
-                System.out.println("Concluir Consulta - 2");
-                System.out.println("Cancelar Consulta - 3");
-                System.out.println("Checar agenda de consultas - 4");
-                System.out.println("Internar um paciente - 5");
-                System.out.println("Finalizar internação - 6");
-                System.out.println("Checar seus pacientes internados - 7");
-                System.out.println("Voltar a tela anterior - 0");
-                System.out.println("============================================");
-                
-                int valor = input.nextInt();
-                input.nextLine();
-
-                switch (valor){
-                    case 1:
-                        System.out.println("Medico cadastrado");
-                        break;
-                    case 2:
-                        System.out.println("Consulta concluida");
-                        break;
-                    case 0:
-                        return;
+            for (Consulta consulta : consultas){
+                if (consulta.getPaciente().getCpf().equals(cpf) && consulta.getStatus().equals("AGENDADA")){
+                    System.out.printf("Atendimento com Dr. %s dia %s às %s\n", consulta.getMedico().getNome(), consulta.getData(), consulta.getHora());
+                    temConsultas = true;
                 }
             }
+
+            if (!temConsultas){
+                System.out.println("Você não tem consultas agendadas");
+            }
+        }
+
+        public static void checarHistoricoConsultas(Scanner input){
+            String cpf = validadorCpf(input);
+            boolean tem = false;
+
+            for (Consulta consulta : consultas){
+                if (consulta.getPaciente().getCpf().equals(cpf)){
+                    System.out.printf("Consulta com Dr. %s dia %s às %s", consulta.getMedico().getNome(), consulta.getData(), consulta.getHora());
+                    tem = true;
+                }
+            }
+
+            if (!tem){
+                System.out.println("Nenhuma consulta no historico");
+            }
+        }
+
+        public static void checarHistoricoInternacoes(Scanner input){
+            String cpf = validadorCpf(input);
+            boolean tem = false;
+
+            for (Internacao internacao : internacaos){
+                if (internacao.getPaciente().getCpf().equals(cpf)){
+                    System.out.printf("Médico responsavel: Dr. %s - Data de entrada: %s - Data de Saida: %s - Quarto: %d\n", internacao.getMedico().getNome(), internacao.getDataEntrada(), internacao.getDataSaida(), internacao.getNumQuarto());
+                    tem = true;
+                }
+            }
+            
+            if (!tem){
+                System.out.println("Nenhuma internação no historico");
+            }
+        }
+
+        public static String validadorCpf(Scanner input){
+            System.out.print("Digite seu cpf: ");
+            String cpf = "";
+
+            while (true) {
+                cpf = input.nextLine();
+
+                if (!cpf.matches("\\d{9}-\\d{2}")){ 
+                    System.out.println("Formato invalido! Use: 000000000-00");
+                    continue;
+                }
+                break;
+            }
+
+            if (!cpfs.contains(cpf)){
+                System.out.println("Desculpa! Não encontramos seu cpf! Gostaria de se cadastrar? [S/N]");
+                String res1 = input.nextLine();
+                while (true){
+                    if (res1.equalsIgnoreCase("S")){
+                        cadastrarPaciente(input);
+                    } else if (res1.equalsIgnoreCase("N")){
+                        return cpf;
+                    } else{
+                        System.out.println("Por favor digite S ou N");
+                        continue;
+                    }
+                    return cpf;
+                }
+            }
+            return cpf;
         }
 
         public static Paciente buscarPacientePorCpf(String cpf) {
@@ -604,8 +655,35 @@
             }
         }
 
-        public static void mostrarConsultasMarcadas(Paciente paciente){
 
+
+        public static void modoMedico(Scanner input){
+            while(true){
+                System.out.println("=============== MODO MEDICO ================");
+                System.out.println("Cadastrar Medico - 1");
+                System.out.println("Concluir Consulta - 2");
+                System.out.println("Cancelar Consulta - 3");
+                System.out.println("Checar agenda de consultas - 4");
+                System.out.println("Internar um paciente - 5");
+                System.out.println("Finalizar internação - 6");
+                System.out.println("Checar seus pacientes internados - 7");
+                System.out.println("Voltar a tela anterior - 0");
+                System.out.println("============================================");
+                
+                int valor = input.nextInt();
+                input.nextLine();
+
+                switch (valor){
+                    case 1:
+                        System.out.println("Medico cadastrado");
+                        break;
+                    case 2:
+                        System.out.println("Consulta concluida");
+                        break;
+                    case 0:
+                        return;
+                }
+            }
         }
 
         public static void salvarPaciente(Paciente paciente){ 
