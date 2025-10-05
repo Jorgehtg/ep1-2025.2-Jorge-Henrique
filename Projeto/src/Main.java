@@ -6,7 +6,7 @@
     import java.util.List;
     import java.util.Scanner;
 
-    public class Main {
+    public class Main{
         
         static ArrayList<Paciente> pacientes = new ArrayList<>();
         static ArrayList<String> cpfs = new ArrayList<>();
@@ -16,18 +16,21 @@
         static ArrayList<PlanoSaude> planos = new ArrayList<>();
         static ArrayList<String> nomePlanos = new ArrayList<>();
         static ArrayList<Consulta> consultas = new ArrayList<>();
+        static ArrayList<Internacao> internacaos = new ArrayList<>();
         
 
-        public static void main(String[] args) {
+        public static void main(String[] args){
 
             carregarPacientesECpfs();
             carregarMedicosEEspecialidades();
             carregarPlanos();
+            // carregarConsultas();
+            // carregarInternacoes();
             
             
             Scanner input = new Scanner(System.in);
 
-            while (true) {
+            while (true){
                 System.out.println("========= GERENCIAMENTO HOSPITALAR =========");
                 System.out.println("Modo Paciente - 1");
                 System.out.println("Modo Medico - 2");
@@ -38,7 +41,7 @@
                 int valor = input.nextInt();
                 input.nextLine();
 
-                switch (valor) {
+                switch (valor){
                     case 1:
                         modoPaciente(input);
                         break;
@@ -46,7 +49,7 @@
                         modoMedico(input);
                         break;
                     case 3:
-                        System.out.println("Adm");
+                        // modoAdministrativo(input);
                         break;
                     case 0:
                         System.out.println("Saindo...");
@@ -58,8 +61,8 @@
             
         }
 
-        public static void modoPaciente(Scanner input) {
-            while (true) {
+        public static void modoPaciente(Scanner input){
+            while (true){
                 System.out.println("============== MODO PACIENTE ===============");
                 System.out.println("Cadastrar paciente - 1");
                 System.out.println("Marcar atendimento - 2");
@@ -73,7 +76,7 @@
                 int valor = input.nextInt();
                 input.nextLine();
 
-                switch (valor) {
+                switch (valor){
                     case 1:
                         System.out.println("============================================");
                         cadastrarPaciente(input);
@@ -197,7 +200,17 @@
 
         public static void marcarAtendimento(Scanner input) {
             System.out.print("Digite seu CPF: ");
-            String cpf = input.nextLine();
+            String cpf = "";
+
+            while (true) {
+                cpf = input.nextLine();
+
+                if (!cpf.matches("\\d{9}-\\d{2}")){ 
+                    System.out.println("Formato invalido! Use: 000000000-00");
+                    continue;
+                }
+                break;
+            }
 
             if(!cpfs.contains(cpf)) {
                 System.out.println("Desculpa! Não encontramos seu cpf! Gostaria de se cadastrar? [S/N]");
@@ -211,117 +224,184 @@
 
             Paciente paciente = buscarPacientePorCpf(cpf);
             
-            System.out.println("Alguma especialidade em especifico? [S/N]");
-            String res2 = input.nextLine(); 
-            
-            Medico escolhido = null;    
+            while (true){
+                System.out.println("Alguma especialidade em especifico? [S/N]");
+                String res2 = input.nextLine(); 
+                
+                Medico medico = null;    
 
-            if (res2.equalsIgnoreCase("S")){
-                while (true){
-                    System.out.println("Qual especialidade?");
-                    String especialidade = input.nextLine();
-                    
-                    if (especialidades.contains(especialidade)){
-                        List<Medico> medicosEspecialidade = mostrarMedicosNumerados(especialidade);
+                if (res2.equalsIgnoreCase("S")){
+                    while (true){
+                        System.out.println("Qual especialidade?");
+                        String especialidade = input.nextLine();
                         
-                        if (medicosEspecialidade.isEmpty()) {
-                            System.out.println("Nenhum médico disponível para esta especialidade.");
-                            continue;
-                        }
+                        if (especialidades.contains(especialidade)){
+                            List<Medico> medicosEspecialidade = mostrarMedicosNumerados(especialidade);
+
+                            while (true){
+                                System.out.println("Qual médico você gostaria? (Digite o número)");
+                            
+                                try{
+                                    int numeroMedico = input.nextInt();
+                                    input.nextLine();
                                 
-                        System.out.println("Qual médico você gostaria? (Digite o número)");
-                        try {
+                                    if (numeroMedico >= 1 && numeroMedico <= medicosEspecialidade.size()){
+                                        medico = medicosEspecialidade.get(numeroMedico - 1);
+                                        Consulta consulta = registrarConsulta(input, medico, paciente);
+                                        if (consulta != null) {
+                                            System.out.printf("Atendimento marcado para dia %s às %s com Dr. %s\n", consulta.getData(), consulta.getHora(), medico.getNome());
+                                            return;
+                                        }
+                                        break;
+                                    } else{
+                                        System.out.println("Número inválido! Tente novamente.");
+                                    }
+                                } catch (Exception e){
+                                    System.out.println("Erro: " + e.getMessage());
+                                    input.nextLine();
+                                }
+                            }
+                        } else{
+                            System.out.println("Desculpa, ainda não temos essa especialidade! Alguma outra? [S/N]");
+                            String res4 = input.nextLine();
+
+                            if (res4.equalsIgnoreCase("S")){
+                                continue;
+                            } else if (res4.equalsIgnoreCase("N")){
+                                System.out.println("Gostaria de marcar com um clinico geral? [S/N]");
+                                String res5 = input.nextLine();
+
+                                if (res5.equalsIgnoreCase("S")){
+                                    List<Medico> medicosClinico = mostrarMedicosNumerados("Clinico Geral");
+                                    
+                                    if (!medicosClinico.isEmpty()) {
+                                        System.out.println("Qual médico você gostaria? (Digite o número)");
+                                        try {
+                                            int numeroMedico = input.nextInt();
+                                            input.nextLine();
+                                            
+                                            if (numeroMedico >= 1 && numeroMedico <= medicosClinico.size()) {
+                                                medico = medicosClinico.get(numeroMedico - 1);
+                                                Consulta consulta = registrarConsulta(input, medico, paciente);
+                                                if (consulta != null) {
+                                                    System.out.printf("Atendimento marcado para dia %s às %s com Dr. %s\n", consulta.getData(), consulta.getHora(), medico.getNome());
+                                                    return;
+                                                }
+                                            } else {
+                                                System.out.println("Número inválido!");
+                                            }
+                                        } catch (Exception e) {
+                                            System.out.println("Por favor, digite um número válido.");
+                                            input.nextLine();
+                                            continue;
+                                        }
+                                    }
+                                    break;
+                                } else if(res5.equalsIgnoreCase("N")){
+                                    return;
+                                } else{
+                                    System.out.println("Digite S ou N");
+                                }
+                            } else {
+                                System.out.println("Digite uma resposta valida");
+                            }
+                        }
+                    }
+                } else if (res2.equalsIgnoreCase("N")){
+                    List<Medico> medicosClinico = mostrarMedicosNumerados("Clinico Geral");
+                    
+                    if (!medicosClinico.isEmpty()){
+                        while (true){
+                            System.out.println("Qual médico você gostaria? (Digite o número)");
+
+                            if (!input.hasNextInt()) {
+                                System.out.println("Por favor, digite um número válido.");
+                                input.nextLine();
+                                continue;
+                            }
+
                             int numeroMedico = input.nextInt();
                             input.nextLine();
                             
-                            if (numeroMedico >= 1 && numeroMedico <= medicosEspecialidade.size()) {
-                                escolhido = medicosEspecialidade.get(numeroMedico - 1);
-                                Consulta consulta = registrarConsulta(input, escolhido, paciente);
-                                if (consulta != null) {
-                                    System.out.println("Consulta agendada com sucesso!");
+                            if (numeroMedico >= 1 && numeroMedico <= medicosClinico.size()) {
+                                medico = medicosClinico.get(numeroMedico - 1);
+                                Consulta consulta = registrarConsulta(input, medico, paciente);
+                                if (consulta != null){
+                                    System.out.printf("Atendimento marcado para dia %s às %s com Dr. %s\n", consulta.getData(), consulta.getHora(), medico.getNome());
+                                    return;
                                 }
                                 break;
-                            } else {
-                                System.out.println("Número inválido! Tente novamente.");
-                            }
-                        } catch (Exception e) {
-                            System.out.println("Por favor, digite um número válido.");
-                            input.nextLine();
-                        }
-                    } else{
-                        System.out.println("Desculpa, ainda não temos essa especialidade! Alguma outra? [S/N]");
-                        String res4 = input.nextLine();
-
-                        if (res4.equalsIgnoreCase("S")){
-                            continue;
-                        } else if (res4.equalsIgnoreCase("N")){
-                            System.out.println("Gostaria de marcar com um clinico geral? [S/N]");
-                            String res5 = input.nextLine();
-
-                            if (res5.equalsIgnoreCase("S")){
-                                List<Medico> medicosClinico = mostrarMedicosNumerados("Clinico Geral");
-                                
-                                if (!medicosClinico.isEmpty()) {
-                                    System.out.println("Qual médico você gostaria? (Digite o número)");
-                                    try {
-                                        int numeroMedico = input.nextInt();
-                                        input.nextLine();
-                                        
-                                        if (numeroMedico >= 1 && numeroMedico <= medicosClinico.size()) {
-                                            escolhido = medicosClinico.get(numeroMedico - 1);
-                                            Consulta consulta = registrarConsulta(input, escolhido, paciente);
-                                            if (consulta != null) {
-                                                System.out.println("Consulta agendada com sucesso!");
-                                            }
-                                        } else {
-                                            System.out.println("Número inválido!");
-                                        }
-                                    } catch (Exception e) {
-                                        System.out.println("Por favor, digite um número válido.");
-                                        input.nextLine();
-                                    }
-                                }
-                                break;
-                            } else if(res5.equalsIgnoreCase("N")){
-                                return;
                             } else{
-                                System.out.println("Digite S ou N");
+                                System.out.println("Número inválido!");
                             }
-                        } else {
-                            System.out.println("Digite uma resposta valida");
                         }
                     }
+                } else {
+                    System.out.println("Digite S ou N");
                 }
-            } else if (res2.equalsIgnoreCase("N")){
-                List<Medico> medicosClinico = mostrarMedicosNumerados("Clinico Geral");
-                
-                if (!medicosClinico.isEmpty()) {
-                    System.out.println("Qual médico você gostaria? (Digite o número)");
-                    try {
-                        int numeroMedico = input.nextInt();
-                        input.nextLine();
-                        
-                        if (numeroMedico >= 1 && numeroMedico <= medicosClinico.size()) {
-                            escolhido = medicosClinico.get(numeroMedico - 1);
-                            Consulta consulta = registrarConsulta(input, escolhido, paciente);
-                            if (consulta != null) {
-                                System.out.println("Consulta agendada com sucesso!");
-                            }
-                        } else {
-                            System.out.println("Número inválido!");
-                        }
-                    } catch (Exception e) {
-                        System.out.println("Por favor, digite um número válido.");
-                        input.nextLine();
-                    }
-                }
-            } else {
-                System.out.println("Digite S ou N");
             }
         }
 
         public static void cancelarAtendimento(Scanner input){
+            System.out.print("Digite seu cpf: ");
+            String cpf = "";
 
+            while (true) {
+                cpf = input.nextLine();
+
+                if (!cpf.matches("\\d{9}-\\d{2}")){ 
+                    System.out.println("Formato invalido! Use: 000000000-00");
+                    continue;
+                }
+                break;
+            }
+
+            if(!cpfs.contains(cpf)) {
+                System.out.println("Desculpa! Não encontramos seu cpf! Gostaria de se cadastrar? [S/N]");
+                String res1 = input.nextLine();
+                
+                if (res1.equalsIgnoreCase("S")){
+                    cadastrarPaciente(input);
+                }
+                return;
+            }
+
+            for (int i = 0; i < consultas.size(); i ++){
+                Consulta consulta = consultas.get(i);
+                if (consulta.getPaciente().getCpf().equalsIgnoreCase(cpf) && consulta.getStatus().equalsIgnoreCase("AGENDADA")){
+                    System.out.printf("%d. Dr. %s - Dia %s às %s\n", i+1, consulta.getMedico().getNome(), consulta.getData(), consulta.getHora());
+                }
+            }
+
+            while (true){
+                System.out.println("Qual dessas deseja cancelar? (0 para finalizar operação)");
+                if (!input.hasNextInt()){
+                    System.out.println("Digite um numero valido");
+                    input.nextLine();
+                }
+
+                int escolha = input.nextInt();
+                input.nextLine();
+
+                if (escolha == 0){
+                    return;
+                }
+
+                if (escolha >= 1 && escolha <= consultas.size()) {
+                    Consulta consultaCancelar = consultas.get(escolha - 1);
+                    consultaCancelar.setStatus("CANCELADA");
+                    consultaCancelar.getMedico().removerAtendimento(consultaCancelar);
+                    //atualizarArquivoConsultas();
+                    
+                    System.out.println("Consulta cancelada com sucesso!");
+                }
+
+                
+            }
+
+
+            
+            
         }
 
 
@@ -373,24 +453,6 @@
             return null;
         }
 
-        public static Medico buscarMedicoPeloNome(String nome){
-            for (Medico medico: medicos){
-                if (medico.getNome().equalsIgnoreCase(nome)){
-                    return medico;
-                }
-            }
-            return null;
-        }
-
-        public static Medico buscarMedicoPeloCrm(String crm){
-            for (Medico medico: medicos){
-                if (medico.getCRM().equalsIgnoreCase(crm)){
-                    return medico;
-                }
-            }
-            return null;
-        }
-
         public static List<Medico> mostrarMedicosNumerados(String especialidade) {
             List<Medico> medicosFiltrados = new ArrayList<>();
             int numero = 1;
@@ -430,6 +492,32 @@
                     int ano = Integer.parseInt(partesData[2]);
 
                     if (ano >= 2025){
+                        if (ano == 2025){
+                            if (mes < 10 || mes > 12){
+                                System.out.println("Mês inválido");
+                                continue;
+                            } else{
+                                if (mes == 10){
+                                    if (dia < 6 || dia > 31){
+                                        System.out.println("Dia inválido");
+                                        continue;
+                                    }
+                                } else{
+                                    if (mes == 11){
+                                        if (dia < 1 || dia > 30){
+                                            System.out.println("Dia inválido");
+                                            continue;
+                                        } else{
+                                            if (dia < 1 || dia > 31){
+                                                System.out.println("Dia inválido");
+                                                continue;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                        }
                         if ((ano % 400 == 0) || (ano % 4 == 0 && ano % 100 != 0)){
                             if (mes == 2){
                                 if (dia < 1 || dia > 29){
@@ -451,7 +539,7 @@
                                 continue;
                             }
                         } else{
-                            if (mes == 02){
+                            if (mes == 2){
                                 if (dia < 1 || dia > 28){
                                     System.out.println("Dia inválido! Digite um valor entre 01 e 28");
                                     continue;
@@ -480,27 +568,61 @@
             }
 
             System.out.println("Qual horario você gostaria? (formato HH:MM)");
-            String horario = input.nextLine();
+            String horario = "";
+
+            while (true){
+                horario = input.nextLine();
+                if (!horario.matches("\\d{2}:\\d{2}")){
+                    System.out.println("Forma inválido! Use HH:MM");
+                    continue;
+                }
+
+                String[] partesHora = horario.split(":");
+                int hora = Integer.parseInt(partesHora[0]);
+                int minutos = Integer.parseInt(partesHora[1]);
+
+                if (hora < 0 || hora > 23){
+                    System.out.println("Hora inválida");
+                    continue;
+                }
+                if (minutos < 0 || minutos > 59){
+                    System.out.println("Minutos inválidos");
+                    continue;
+                }
+                break;
+            }
             
             if (medico.isHorarioLivre(data, horario)){
-                Consulta c = new Consulta(paciente, medico, data, horario, "Consultório");
+                Consulta consulta = new Consulta(paciente, medico, data, horario, "Consultório");
 
-                medico.addAtendimento(c);
-                return c;
+                medico.addAtendimento(consulta);
+                consultas.add(consulta);
+                salvarConsulta(consulta);
+                return consulta;
             } else{
                 return null;
             }
         }
 
+        public static void mostrarConsultasMarcadas(Paciente paciente){
 
+        }
 
         public static void salvarPaciente(Paciente paciente){ 
-                    try{
-                        Files.write(Paths.get("Dados/Pacientes.csv"), ("\n" + paciente.toString()).getBytes(), StandardOpenOption.APPEND);
-                    } catch(IOException erro) {
-                        System.out.println("Erro: " + erro.getMessage());
-                    }
-                }
+            try{
+                Files.write(Paths.get("Dados/Pacientes.csv"), ("\n" + paciente.toString()).getBytes(), StandardOpenOption.APPEND);
+            } catch(IOException erro){
+                System.out.println("Erro: " + erro.getMessage());
+            }
+        }
+
+        public static void salvarConsulta(Consulta consulta){
+            try{
+                Files.write(Paths.get("Dados/Consultas.csv"), ("\n" + consulta.toString()).getBytes(), StandardOpenOption.APPEND);
+            } catch(IOException erro){
+                System.out.println("Erro: " + erro.getMessage());
+            }
+        }
 
         public static void carregarPacientesECpfs(){
             try {
