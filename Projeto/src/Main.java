@@ -13,6 +13,7 @@
         static ArrayList<String> cpfs = new ArrayList<>();
         static ArrayList<Medico> medicos = new ArrayList<>();
         static ArrayList<Medico> gerais = new ArrayList<>();
+        static ArrayList<String> crms = new ArrayList<>();
         static ArrayList<String> especialidades = new ArrayList<>();
         static ArrayList<PlanoSaude> planos = new ArrayList<>();
         static ArrayList<String> nomePlanos = new ArrayList<>();
@@ -121,22 +122,7 @@
             String nome = input.nextLine();
 
             System.out.print("Digite o cpf do paciente (formato 000000000-00): ");
-            String cpf = "";
-
-            while (true) {
-                cpf = input.nextLine();
-
-                if (!cpf.matches("\\d{9}-\\d{2}")){ 
-                    System.out.println("Formato invalido! Use: 000000000-00");
-                    continue;
-                } else{
-                        if (cpfs.contains(cpf)){
-                            System.out.println("Paciente já cadastrado");
-                            return;
-                        }
-                        break;
-                    }
-            }
+            String cpf = validadorCpf(input);
 
             int idade = 0;
             while (true) {
@@ -524,8 +510,6 @@
             return medicosFiltrados;
         }
 
-        
-
         public static Consulta registrarConsulta(Scanner input, Medico medico, Paciente paciente){
 
             System.out.println("Qual data você gostaria? (formato DD/MM/AAAA)");
@@ -679,7 +663,7 @@
                         cadastrarMedico(input);
                         break;
                     case 2:
-                        System.out.println("Consulta concluida");
+                        concluirConsulta(input);
                         break;
                     case 3:
                         break;
@@ -700,11 +684,15 @@
         }
 
         public static void cadastrarMedico(Scanner input){
+            System.out.println("============================================");
             System.out.print("Digite o nome do medico: ");
             String nome = input.nextLine();
 
-            System.out.print("Digite o CRM do medico: ");
-            String crm = input.nextLine();
+            String crm = validadorCrm(input);
+            if (crms.contains(crm)){
+                System.out.println("Medico já cadastrado");
+                return;
+            }
 
             System.out.println("O medico tem especialidade? [S/N]");
             String res1 = input.nextLine();
@@ -721,6 +709,7 @@
                 Medico medico = new Medico(nome, crm, especialidade, custoConsulta);
 
                 medicos.add(medico);
+                crms.add(crm);
                 if (!especialidades.contains(especialidade)){
                     especialidades.add(especialidade);
                 }
@@ -740,7 +729,130 @@
                 }
                 salvarMedico(medico);
             }
+            System.out.println("============================================\n");
+        }
+
+        public static void concluirConsulta(Scanner input){
+            System.out.print("Digite seu crm (formato CRM/XX 000000): ");
+            String crm = validadorCrm(input);
+            Medico medico = buscarMedicoPeloCrm(crm);
+
+            if (medico == null){
+                System.out.println("Medico não encontrado");
+                return;
+            }
+
+            System.out.print("Digite o cpf do paciente (formato 000000000-00): ");
+            String cpf = validadorCpf(input);
+
+            List<Consulta> consultasAgendadas = new ArrayList<>();
+
+            for(Consulta consulta : consultas){
+                if (consulta.getStatus().equals("AGENDADA") && 
+                    consulta.getMedico().getCRM().equals(crm) && 
+                    consulta.getPaciente().getCpf().equals(cpf)){
+                    consultasAgendadas.add(consulta);
+                }
+            }
+
+            if (consultasAgendadas.isEmpty()){
+                System.out.println("Nenhuma consulta agendada encontrada");
+                return;
+            }
+
+            Consulta consultaEscolhida;
             
+            if (consultasAgendadas.size() == 1){
+                consultaEscolhida = consultasAgendadas.get(0);
+                System.out.println("Única consulta encontrada: Data: " + consultaEscolhida.getData() + " Hora: " + consultaEscolhida.getHora());
+            } else {
+                System.out.println("Consultas agendadas encontradas:");
+                for (int i = 0; i < consultasAgendadas.size(); i++){
+                    Consulta c = consultasAgendadas.get(i);
+                    System.out.printf("%d - Data: %s Hora: %s%n", i + 1, c.getData(), c.getHora());
+                }
+                
+                System.out.println("Qual delas você deseja concluir? (Digite o numero)");
+                int escolha = 0;
+                while (true){
+                    if (!input.hasNextInt()) {
+                        System.out.println("Digite um número válido.");
+                        input.nextLine();
+                        continue;
+                    }
+                    escolha = input.nextInt();
+                    input.nextLine();
+                    
+                    if (escolha >= 1 && escolha <= consultasAgendadas.size()){
+                        break;
+                    } else {
+                        System.out.println("Digite um número entre 1 e " + consultasAgendadas.size());
+                    }
+                }
+                consultaEscolhida = consultasAgendadas.get(escolha - 1);
+            }
+
+            System.out.println("Qual o diagnostico?");
+            String diagnostico = input.nextLine();
+
+            Prescricao prescricao = null;
+            System.out.println("Tem alguma prescrição? [S/N]");
+            String res1 = input.nextLine();
+
+            if (res1.equalsIgnoreCase("S")){
+                System.out.println("Qual o remedio?");
+                String remedio = input.nextLine();
+
+                int dias = 0;
+                while (true){
+                    System.out.println("Por quantos dias?");
+                    if (!input.hasNextInt()) {
+                        System.out.println("Por favor, digite um número válido.");
+                        input.nextLine();
+                        continue;
+                    }
+                    dias = input.nextInt();
+                    input.nextLine();
+                    if (dias < 1){
+                        System.out.println("Digite uma quantidade valida de dias (mínimo 1)");
+                        continue;
+                    }
+                    break;
+                }
+                prescricao = new Prescricao(medico, remedio, dias);
+            }
+
+            consultaEscolhida.concluirConsulta(diagnostico, prescricao);
+            consultaEscolhida.setStatus("CONCLUIDA");
+            //atualizarArquivoConsultas();
+            
+            System.out.println("Consulta concluída");
+        }
+            
+
+        public static String validadorCrm(Scanner input){
+            System.out.print("Digite o crm (formato CRM/XX 000000): ");
+            String crm = "";
+            while (true){
+                crm = input.nextLine().trim().toUpperCase();
+
+                if (!crm.matches("CRM/[A-Z]{2}\\s\\d{6}")){
+                    System.out.println("Formato invalido! Use CRM/XX 000000");
+                    continue;
+                }
+                return crm;
+            }
+        }
+
+        public static Medico buscarMedicoPeloCrm(String crm){
+            for (Medico medico: medicos){
+                if (!crms.contains(medico.getCRM())){
+                    System.out.println("Medico não encontrado");
+                    return null;
+                }
+                return medico;
+            }
+            return null;
         }
 
         public static void salvarPaciente(Paciente paciente){ 
@@ -765,7 +877,20 @@
             } catch(IOException erro){
                 System.out.println("Erro: " + erro.getMessage());
             }
-        
+        }
+
+        public static void atualizarArquivoConsultas(){
+            try{
+                List<String> linhas = new ArrayList<>();
+
+                for (Consulta consulta : consultas){
+                    linhas.add(consulta.toString());
+                }
+
+                Files.write(Paths.get("Dados/Consultas.csv"), linhas);
+            } catch (IOException erro){
+                System.out.println("Erro: " + erro.getMessage());
+            }
         }
 
         public static void carregarPacientesECpfs(){
@@ -799,6 +924,11 @@
                     String[] dados = linha.split(",", 5);
 
                     double custoConsulta = Double.parseDouble(dados[3].trim());
+
+                    String crm = dados[1].trim();
+                    if (!crms.contains(crm)){
+                        crms.add(crm);
+                    }
                     
                     if (dados[2].equalsIgnoreCase("Clinico Geral")){
                         Medico medico = new Medico(dados[0], dados[1], custoConsulta);
