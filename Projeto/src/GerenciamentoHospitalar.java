@@ -77,7 +77,7 @@ public class GerenciamentoHospitalar{
                     break;
                 case 3:
                     System.out.println("============================================");
-                    //cancelarConsultaPaciente(input);
+                    cancelarConsultaPaciente(input);
                     System.out.println("============================================\n");
                     break;
                 case 4:
@@ -170,13 +170,12 @@ public class GerenciamentoHospitalar{
 
     public static void cancelarConsultaPaciente(Scanner input){
         String cpf = validarCpf(input);
-        buscarPacientePeloCpf(cpf);
         List<Consulta> consultasPaciente = new ArrayList<>();
 
         for (int i = 0; i < consultas.size(); i ++){
             Consulta consulta = consultas.get(i);
             if (consulta.getPaciente().getCpf().equalsIgnoreCase(cpf) && consulta.getStatus().equalsIgnoreCase("AGENDADA")){
-                System.out.printf("%d. Dr. %s - Dia %s às %s\n", i+1, consulta.getMedico().getNome(), consulta.getData(), consulta.getHora());
+                System.out.printf("%d. Dr. %s %s - Dia %s às %s\n", i+1, consulta.getMedico().getNome(), consulta.getMedico().getCRM(), consulta.getData(), consulta.getHora());
                 consultasPaciente.add(consulta);
             }
         }
@@ -187,14 +186,13 @@ public class GerenciamentoHospitalar{
         }
 
         while (true){
-            System.out.println("Qual dessas deseja cancelar? (0 para cancelar operação)");
+            System.out.println("Qual dessas deseja cancelar? (Digite o numero ou 0 para cancelar a operação)");
             if (!input.hasNextInt()){
                 System.out.println("Digite um numero valido");
                 input.nextLine();
             }
 
-            int escolha = input.nextInt();
-            input.nextLine();
+            int escolha = validarInt(input);
 
             if (escolha == 0){
                 return;
@@ -214,9 +212,53 @@ public class GerenciamentoHospitalar{
         }
     }
 
+    public static void checarConsultasAgendadas(Scanner input){
+        String cpf = validarCpf(input);
+        boolean temConsultas = false;
+        for (Consulta consulta : consultas){
+            if (consulta.getPaciente().getCpf().equals(cpf) && consulta.getStatus().equals("AGENDADA")){
+                System.out.printf("Atendimento com Dr. %s dia %s às %s\n", consulta.getMedico().getNome(), consulta.getData(), consulta.getHora());
+                temConsultas = true;
+            }
+        }
+
+        if (!temConsultas){
+            System.out.println("Você não tem consultas agendadas");
+        }
+    }
+
+    public static void checarHistoricoInternacoes(Scanner input){
+        String cpf = validarCpf(input);
+        boolean temInternacoes = false;
+        for (Internacao internacao : internacaos){
+            if (internacao.getPaciente().getCpf().equals(cpf)){
+                System.out.printf("Médico responsavel: Dr. %s - Data de entrada: %s - Data de Saida: %s - Quarto: %d\n", internacao.getMedico().getNome(), internacao.getDataEntrada(), internacao.getDataSaida(), internacao.getNumQuarto());
+                temInternacoes = true;
+            }
+        }
+        if (!temInternacoes){
+            System.out.println("Nenhuma internação no historico");
+        }
+    }
+
+    public static void checarHistoricoConsultas(Scanner input){
+        String cpf = validarCpf(input);
+        boolean temConsultas = false;
+        for (Consulta consulta : consultas){
+            if (consulta.getPaciente().getCpf().equals(cpf)){
+                System.out.printf("Consulta com Dr. %s dia %s às %s", consulta.getMedico().getNome(), consulta.getData(), consulta.getHora());
+                temConsultas = true;
+            }
+        }
+        if (!temConsultas){
+            System.out.println("Nenhuma consulta no historico");
+        }
+    }
+
+
     public static void pacienteComPlano(Scanner input, String nome, String cpf, int idade){
-        System.out.print("Digite o nome do plano: ");
         while (true){
+            System.out.print("Digite o nome do plano: ");
             String nomePlano = input.nextLine().toLowerCase();
             if (nomesPlanos.contains(nomePlano)){
                 PlanoSaude plano = buscarPlanoPeloNome(nomePlano);
@@ -237,24 +279,6 @@ public class GerenciamentoHospitalar{
                 }
             }
         }
-    }
-
-    public static PlanoSaude buscarPlanoPeloNome(String nome){
-        for (PlanoSaude plano : planos){
-            if (plano.getNome().equalsIgnoreCase(nome)){
-                return plano;
-            }
-        }
-        return null;
-    }
-
-    public static Paciente buscarPacientePeloCpf(String cpf){
-        for(Paciente paciente : pacientes){
-            if (paciente.getCpf().equals(cpf)){
-                return paciente;
-            }
-        }
-        return null;
     }
 
     public static void registrarConsulta(Scanner input ,String especialidade, Paciente paciente){
@@ -311,6 +335,28 @@ public class GerenciamentoHospitalar{
         System.out.printf("Consulta marcada para %s às %s com Dr. %s", data, hora, medico.getNome());
     }
 
+
+    //buscadores
+    public static PlanoSaude buscarPlanoPeloNome(String nome){
+        for (PlanoSaude plano : planos){
+            if (plano.getNome().equalsIgnoreCase(nome)){
+                return plano;
+            }
+        }
+        return null;
+    }
+
+    public static Paciente buscarPacientePeloCpf(String cpf){
+        for(Paciente paciente : pacientes){
+            if (paciente.getCpf().equals(cpf)){
+                return paciente;
+            }
+        }
+        return null;
+    }
+
+
+    //validadores
     public static String validarCpf(Scanner input){
         System.out.print("Digite o cpf do paciente (formato 000000000-00): ");
         String cpf;
