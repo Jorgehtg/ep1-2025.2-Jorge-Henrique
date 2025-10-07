@@ -110,7 +110,7 @@ public class Consulta {
     @Override
     public String toString(){
         if (!status.equalsIgnoreCase("CONCLUIDA")){
-            return String.format("%s,%s,%s,%s,%s,%s", paciente.getNome(), medico.getNome(), data, hora, local, status);
+            return String.format("%s,%s,%s,%s,%s,%s,%s,%s", paciente.getNome(), paciente.getCpf(), medico.getNome(), medico.getCRM(), data, hora, local, status);
         }
         return String.format("%s,%s,%s,%s,%s,%s,%s,%s", paciente.getNome(), medico.getNome(), data, hora, local, status, diagnostico, prescricao.prescricaoConsulta());
     }
