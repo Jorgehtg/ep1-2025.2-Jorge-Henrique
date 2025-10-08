@@ -1,5 +1,8 @@
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -20,6 +23,12 @@ public class GerenciamentoHospitalar{
     static ArrayList<Internacao> internacoes = new ArrayList<>();
     public static void main(String[] args){
         Scanner input = new Scanner(System.in);
+
+        carregarPacientes_Cpfs();
+        carregarMedicos_Especialidades_Crms();
+        carregarConsultas();
+        carregarInternacoes();
+        carregarPlanos();
     
         while (true){
             System.out.println("========= GERENCIAMENTO HOSPITALAR =========");
@@ -43,12 +52,15 @@ public class GerenciamentoHospitalar{
                     break;
                 case 0:
                     System.out.println("Saindo...");
+                    input.close();
                     return;
                 default:
                     System.out.println("Escolha uma opção válida");
             }
-        }  
+        }
     }
+
+
 
     public static void modoPaciente(Scanner input){
         while (true){
@@ -124,7 +136,7 @@ public class GerenciamentoHospitalar{
         System.out.println("Paciente Cadastrado");
         pacientes.add(paciente);
         cpfs.add(cpf);
-        //salvarPaciente;
+        salvarPaciente(paciente);
         return;
     }
 
@@ -156,7 +168,6 @@ public class GerenciamentoHospitalar{
             }
         } else{
             registrarConsulta(input, null, paciente);
-            
         }
     }
 
@@ -188,7 +199,7 @@ public class GerenciamentoHospitalar{
                 Consulta consultaCancelar = consultasPaciente.get(escolha - 1);
                 consultaCancelar.setStatus("CANCELADA");
                 consultaCancelar.getMedico().removerAtendimento(consultaCancelar);
-                //atualizarArquivoConsultas(consultaCancelar);
+                atualizarArquivoConsultas(consultaCancelar);
                 System.out.println("Consulta cancelada com sucesso!");
                 return;
             } else{
@@ -329,7 +340,7 @@ public class GerenciamentoHospitalar{
         if (!especialidades.contains(especialidade)){
             especialidades.add(especialidade);
         }
-        //salvarMedico()
+        salvarMedico(medico);
         System.out.println("Medico cadastrado");
         return;
     }
@@ -377,14 +388,16 @@ public class GerenciamentoHospitalar{
             consulta.concluirConsulta(diagnostico, prescricao);
             medico.removerAtendimento(consulta);
             consulta.getPaciente().addConsultas(consulta);
-            //atualizarArquivoConsulta();
-            //atualizarListaConsulta();
+            atualizarArquivoConsultas(consulta);
+            atualizarArquivoPaciente(consulta.getPaciente());
             System.out.println("Consulta concluida");
             return;     
         }
         consulta.concluirConsulta(diagnostico, null);
         medico.removerAtendimento(consulta);
         consulta.getPaciente().addConsultas(consulta);
+        atualizarArquivoConsultas(consulta);
+        atualizarArquivoPaciente(consulta.getPaciente());
         System.out.println("Consulta concluida");
         return;
     }
@@ -420,7 +433,9 @@ public class GerenciamentoHospitalar{
         Consulta consulta = consultasAgendadas.get(escolha-1);
         consulta.setStatus("CANCELADA");
         medico.removerAtendimento(consulta);
-        //atualizarArquivoConsultas(consultaCancelar);
+        atualizarArquivoConsultas(consulta);
+        atualizarArquivoPaciente(consulta.getPaciente());
+        atualizarArquivoMedico(medico);
         System.out.println("Consulta cancelada");
         return;
     }
@@ -452,6 +467,7 @@ public class GerenciamentoHospitalar{
         double valor = validarDouble(input);
         Internacao internacao = new Internacao(paciente, medico, dataEntrada, numQuarto, valor);
         internacoes.add(internacao);
+        salvarInternacao(internacao);
         System.out.println("Paciente internado");
     }
 
@@ -489,6 +505,10 @@ public class GerenciamentoHospitalar{
         System.out.print("Digite a data de saida (Formato DD/MM/AAAA): ");
         String dataSaida = validarData(input);
         internacao.finalizarInternacao(dataSaida);
+        atualizarArquivoInternacao(internacao);
+        internacao.getPaciente().addInternacoes(internacao);
+        atualizarArquivoPaciente(internacao.getPaciente());
+        atualizarArquivoInternacao(internacao);
         System.out.printf("Internação finalizada no dia %s", dataSaida);
         return;        
     }
@@ -511,6 +531,8 @@ public class GerenciamentoHospitalar{
         }
         return;
     }
+
+
 
     public static void modoAdministrativo(Scanner input){
         while (true){
@@ -629,7 +651,7 @@ public class GerenciamentoHospitalar{
                 plano.addDescontos(especialidades[i], descontoNormal, descontoIdoso);
             }
             planos.add(plano);
-            //salvarPlano();
+            salvarPlano(plano);
             System.out.println("Plano de Saude especial cadastrado");
             return;
         }
@@ -640,7 +662,7 @@ public class GerenciamentoHospitalar{
                 plano.addDescontos(especialidades[i], descontoNormal, descontoIdoso);
             }
         planos.add(plano);
-        //salvarPlano();
+        salvarPlano(plano);
         System.out.println("Plano de Saude cadastrado");
         return;
     }
@@ -774,6 +796,7 @@ public class GerenciamentoHospitalar{
                 if (internacao.getDataSaida() == null) j++;
             }
             writer.write("Numero de internacoes ativas no momento: " + j + "\n");
+            writer.write("Numero de planos disponiveis: " + planos.size() + "\n");
             System.out.println("Relatorio exportado com sucesso"); 
         } catch (IOException e) {
             System.out.println("Erro: " + e.getMessage());
@@ -786,15 +809,13 @@ public class GerenciamentoHospitalar{
         while (true){
             System.out.print("Digite o nome do plano: ");
             String nomePlano = validarEntrada(input);
-
             if (nomesPlanos.contains(nomePlano)){
                 PlanoSaude plano = buscarPlanoPeloNome(nomePlano);
                 PacienteEspecial paciente = new PacienteEspecial(nome, cpf, idade, plano);
                 pacientes.add(paciente);
                 cpfs.add(cpf);
-                //salvarPaciente;
+                salvarPaciente(paciente);
                 return;
-
             } else{
                 System.out.println("Parece que não trabalhamos com esse plano, gostaria de tentar outro? [S/N]");
                 String resposta = validarResposta(input);
@@ -802,7 +823,7 @@ public class GerenciamentoHospitalar{
                     Paciente paciente = new Paciente(nome, cpf, idade);
                     pacientes.add(paciente);
                     cpfs.add(cpf);
-                    //salvarPaciente(paciente);
+                    salvarPaciente(paciente);
                     return;
                 }
             }
@@ -870,13 +891,10 @@ public class GerenciamentoHospitalar{
         Consulta consulta = new Consulta(paciente, medico, data, hora, "Consultorio");
         consultas.add(consulta);
         medico.addAtendimento(consulta);
-        //salvarConsulta(consulta);
-        
+        salvarConsulta(consulta);
+        atualizarArquivoMedico(medico);
         System.out.printf("Consulta marcada para %s às %s com Dr. %s", data, hora, medico.getNome());
     }
-
-    public static void descontosPlano(Scanner input){}
-
 
     //buscadores
     public static PlanoSaude buscarPlanoPeloNome(String nome){
@@ -1077,6 +1095,324 @@ public class GerenciamentoHospitalar{
             } else {
                 System.out.println("Entrada não pode ser vazia");
             }
+        }
+    }
+
+    //arquivos
+    public static void salvarPaciente(Paciente paciente){
+        try{
+            Files.createDirectories(Paths.get("Dados"));
+            java.io.File arquivo = new java.io.File("Dados/Pacientes.csv");
+            if (!arquivo.exists()) {
+                Files.write(Paths.get("Dados/Pacientes.csv"), "Nome,CPF,Idade,Plano".getBytes());
+            }
+            Files.write(Paths.get("Dados/Pacientes.csv"), ("\n" + paciente.toString()).getBytes(), StandardOpenOption.APPEND);
+        } catch(IOException erro){
+            System.out.println("Erro ao salvar paciente: " + erro.getMessage());
+        }
+    }
+
+    public static void salvarMedico(Medico medico){
+        try{
+            Files.createDirectories(Paths.get("Dados"));
+            java.io.File arquivo = new java.io.File("Dados/Medicos.csv");
+            if (!arquivo.exists()) {
+                Files.write(Paths.get("Dados/Medicos.csv"), "Nome,CRM,Especialidade,Agenda".getBytes());
+            }
+            Files.write(Paths.get("Dados/Medicos.csv"), ("\n" + medico.toString()).getBytes(), StandardOpenOption.APPEND);
+        } catch(IOException erro){
+            System.out.println("Erro ao salvar medico: " + erro.getMessage());
+        }
+    }
+
+    public static void salvarConsulta(Consulta consulta){
+        try{
+            Files.createDirectories(Paths.get("Dados"));
+            java.io.File arquivo = new java.io.File("Dados/Consultas.csv");
+            if (!arquivo.exists()) {
+                Files.write(Paths.get("Dados/Consultas.csv"), "Paciente,CPF do Paciente,Medico,CRM do Medico,Data,Hora,Local,Status,Diagnostico,Prescricao".getBytes());
+            }
+            Files.write(Paths.get("Dados/Consultas.csv"), ("\n" + consulta.toString()).getBytes(), StandardOpenOption.APPEND);
+        } catch(IOException erro){
+            System.out.println("Erro ao salvar consulta: " + erro.getMessage());
+        }
+    }
+
+    public static void salvarInternacao(Internacao internacao){
+        try{
+            Files.createDirectories(Paths.get("Dados"));
+            java.io.File arquivo = new java.io.File("Dados/Internacoes.csv");
+            if (!arquivo.exists()) {
+                Files.write(Paths.get("Dados/Internacoes.csv"), "Paciente,CPF do Paciente,Medico,CRM do Medico,Data de Entrada,Data de Saida,Quarto".getBytes());
+            }
+            Files.write(Paths.get("Dados/Internacoes.csv"), ("\n" + internacao.toString()).getBytes(), StandardOpenOption.APPEND);
+        } catch(IOException erro){
+            System.out.println("Erro ao salvar internacao: " + erro.getMessage());
+        }
+
+    }
+
+    public static void salvarPlano(PlanoSaude plano){
+        try{
+            Files.createDirectories(Paths.get("Dados"));
+            java.io.File arquivo = new java.io.File("Dados/Planos.csv");
+            if (!arquivo.exists()) {
+                Files.write(Paths.get("Dados/Planos.csv"), "Nome,Tipo,Descontos,Desconto por Internação".getBytes());
+            }
+            Files.write(Paths.get("Dados/Planos.csv"), ("\n" + plano.toString()).getBytes(), StandardOpenOption.APPEND);
+        } catch(IOException erro){
+            System.out.println("Erro ao salvar internacao: " + erro.getMessage());
+        }
+    }
+
+    public static void atualizarArquivoConsultas(Consulta consultaAtualizar) {
+        try (java.io.PrintWriter writer = new java.io.PrintWriter("Dados/Consultas.csv")){
+            for (Consulta consulta : consultas) {
+                if (consulta.getPaciente().getCpf().equals(consultaAtualizar.getPaciente().getCpf()) && consulta.getMedico().getCrm().equals(consultaAtualizar.getMedico().getCrm()) && consulta.getData().equals(consultaAtualizar.getData()) && consulta.getHora().equals(consultaAtualizar.getHora())){
+                    writer.println(consultaAtualizar.toString());
+                }
+                else{
+                    writer.println(consulta.toString());
+                }
+            }
+        } catch (java.io.IOException e) {
+            System.out.println("Erro ao atualizar arquivo: " + e.getMessage());
+        }
+    }
+
+    public static void atualizarArquivoPaciente(Paciente pacienteAtualizado) {
+        try {
+            java.nio.file.Path arquivoPath = java.nio.file.Paths.get("Dados/Pacientes.csv");
+            java.util.List<String> linhas = Files.readAllLines(arquivoPath);
+            java.util.List<String> novasLinhas = new ArrayList<>();
+            boolean encontrou = false;
+            for (String linha : linhas) {
+                if (linha.contains(pacienteAtualizado.getCpf())) {
+                    String novaLinha = pacienteAtualizado.toString();
+                    novasLinhas.add(novaLinha);
+                    encontrou = true;
+                } else {
+                    novasLinhas.add(linha);
+                }
+            }
+            if (!encontrou) {
+                String novaLinha = pacienteAtualizado.toString();
+                novasLinhas.add(novaLinha);
+            }
+            Files.write(arquivoPath, novasLinhas);
+        } catch (java.io.IOException e) {
+            System.out.println("Erro ao atualizar arquivo do paciente: " + e.getMessage());
+        }
+    }
+
+    public static void atualizarArquivoMedico(Medico medico){
+        try {
+            java.nio.file.Path arquivoPath = java.nio.file.Paths.get("Dados/Medicos.csv");
+            java.util.List<String> linhas = Files.readAllLines(arquivoPath);
+            java.util.List<String> novasLinhas = new java.util.ArrayList<>();
+            for (String linha : linhas) {
+                if (linha.contains(medico.getCrm())){
+                    String novaLinha = medico.toString();
+                    novasLinhas.add(novaLinha);
+                } else {
+                    novasLinhas.add(linha);
+                }
+            }
+            Files.write(arquivoPath, novasLinhas);
+        } catch (java.io.IOException e) {
+            System.out.println("Erro ao atualizar histórico do médico: " + e.getMessage());
+        }
+    }
+
+    public static void atualizarArquivoInternacao(Internacao internacao) {
+        try {
+            java.nio.file.Path arquivoPath = java.nio.file.Paths.get("Dados/Internacoes.csv");
+            java.util.List<String> linhas = Files.readAllLines(arquivoPath);
+            java.util.List<String> novasLinhas = new java.util.ArrayList<>();
+            for (String linha : linhas) {
+                if (linha.contains(internacao.getPaciente().getCpf()) && linha.contains(internacao.getMedico().getCrm()) && linha.contains(internacao.getDataEntrada())){
+                    String novaLinha = internacao.toString();
+                    novasLinhas.add(novaLinha);
+                } else {
+                    novasLinhas.add(linha);
+                }
+            }
+            Files.write(arquivoPath, novasLinhas);
+        } catch (java.io.IOException e) {
+            System.out.println("Erro ao atualizar internação: " + e.getMessage());
+        }
+    }
+
+    public static void carregarPacientes_Cpfs(){
+        try {
+            new java.io.File("Dados").mkdirs();
+            java.nio.file.Path arquivoPath = java.nio.file.Paths.get("Dados/Pacientes.csv");
+            if (!java.nio.file.Files.exists(arquivoPath)) return;
+            List<String> linhas = Files.readAllLines(arquivoPath);
+            for (int i = 1; i < linhas.size(); i++){
+                String linha = linhas.get(i).trim();
+                if (linha.isEmpty()) continue;
+                String[] dados = linha.split(",");
+                if (dados.length >= 3) {
+                    String nome = dados[0].trim();
+                    String cpf = dados[1].trim();
+                    int idade = Integer.parseInt(dados[2].trim());
+                    if (dados.length >= 4 && !dados[3].trim().equalsIgnoreCase("PARTICULAR")) {
+                        String nomePlano = dados[3].trim();
+                        PlanoSaude plano = buscarPlanoPeloNome(nomePlano);
+                        if (plano != null) {
+                            PacienteEspecial paciente = new PacienteEspecial(nome, cpf, idade, plano);
+                            pacientes.add(paciente);
+                        } else {
+                            Paciente paciente = new Paciente(nome, cpf, idade);
+                            pacientes.add(paciente);
+                        }
+                    } else {
+                        Paciente paciente = new Paciente(nome, cpf, idade);
+                        pacientes.add(paciente);
+                    }
+                    if (!cpfs.contains(cpf)) {
+                        cpfs.add(cpf);
+                    }
+                }
+            }
+        } catch (IOException e){
+            System.out.println("Erro ao carregar pacientes: " + e.getMessage());
+        }
+    }
+
+    public static void carregarMedicos_Especialidades_Crms(){
+        try{
+            new java.io.File("Dados").mkdirs();
+            java.nio.file.Path arquivoPath = java.nio.file.Paths.get("Dados/Medicos.csv");
+            if (!java.nio.file.Files.exists(arquivoPath)) return;
+            List<String> linhas = Files.readAllLines(arquivoPath);
+            for (int i = 1; i < linhas.size(); i++){
+                String linha = linhas.get(i).trim();
+                if (linha.isEmpty()) continue;
+                String[] dados = linha.split(",", 5);
+                if (dados.length >= 4) {
+                    String nome = dados[0].trim();
+                    String crm = dados[1].trim();
+                    String especialidade = dados[2].trim();
+                    double custoConsulta = Double.parseDouble(dados[3].trim());
+                    if (!crms.contains(crm)){
+                        crms.add(crm);
+                    }
+                    if (!especialidades.contains(especialidade)){
+                        especialidades.add(especialidade);
+                    }
+                    if (especialidade.equalsIgnoreCase("Clinico Geral")){
+                        Medico medico = new Medico(nome, crm, "clinico geral", custoConsulta);
+                        medicos.add(medico);
+                    } else{
+                        Medico medico = new Medico(nome, crm, especialidade, custoConsulta);
+                        medicos.add(medico);
+                    }
+                }
+            }
+            System.out.println("Médicos carregados: " + medicos.size());
+            System.out.println("Especialidades carregadas: " + especialidades.size());  
+        } catch (IOException e){
+            System.out.println("Erro ao carregar médicos: " + e.getMessage());
+        } 
+    }
+
+    public static void carregarConsultas(){
+        try {
+            new java.io.File("Dados").mkdirs();
+            java.nio.file.Path arquivoPath = java.nio.file.Paths.get("Dados/Consultas.csv");
+            if (!java.nio.file.Files.exists(arquivoPath)) return;
+            List<String> linhas = Files.readAllLines(arquivoPath);
+            for (int i = 1; i < linhas.size(); i++){
+                String linha = linhas.get(i).trim();
+                if (linha.isEmpty()) continue;
+                String[] dados = linha.split(",");
+                
+                if (dados.length >= 6) {
+                    String pacienteCpf = dados[0].trim();
+                    String medicoCrm = dados[1].trim();
+                    String data = dados[2].trim();
+                    String hora = dados[3].trim();
+                    String local = dados[4].trim();
+                    String status = dados[5].trim();
+                    Paciente paciente = buscarPacientePeloCpf(pacienteCpf);
+                    Medico medico = buscarMedicoPeloCrm(medicoCrm);
+                    if (paciente != null && medico != null) {
+                        Consulta consulta = new Consulta(paciente, medico, data, hora, local);
+                        consulta.setStatus(status);
+                        if (dados.length >= 7 && !dados[6].trim().isEmpty()){
+                            consulta.setDiagnostico(dados[6].trim());
+                        }
+                        if (dados.length >= 9 && !dados[7].trim().isEmpty() && !dados[8].trim().isEmpty()){
+                            String remedio = dados[7].trim();
+                            int dias = Integer.parseInt(dados[8].trim());
+                            Prescricao prescricao = new Prescricao(medico, remedio, dias);
+                            consulta.setPrescricao(prescricao);
+                        }
+                        consultas.add(consulta);
+                        if (status.equals("AGENDADA")) {
+                            medico.addAtendimento(consulta);
+                        }
+                    }
+                }
+            }
+        } catch (IOException e){
+            System.out.println("Erro ao carregar consultas: " + e.getMessage());
+        }
+    }
+
+    public static void carregarInternacoes(){
+        try{
+            new java.io.File("Dados").mkdirs();
+            java.nio.file.Path arquivoPath = java.nio.file.Paths.get("Dados/Internacoes.csv");
+            if (!java.nio.file.Files.exists(arquivoPath)) return;
+            List<String> linhas = Files.readAllLines(arquivoPath);
+            for (int i = 1; i < linhas.size(); i++){
+                String linha = linhas.get(i).trim();
+                if (linha.isEmpty()) continue;
+                String[] dados = linha.split(",");
+                if (dados.length >= 7){
+                    String pacienteCpf = dados[1].trim();
+                    String medicoCrm = dados[3].trim();
+                    String dataEntrada = dados[4].trim();
+                    String dataSaida = dados[5].trim();
+                    int numQuarto = Integer.parseInt(dados[6].trim());
+                    double valor = dados.length >= 8 ? Double.parseDouble(dados[7].trim()) : 0.0;
+                    Paciente paciente = buscarPacientePeloCpf(pacienteCpf);
+                    Medico medico = buscarMedicoPeloCrm(medicoCrm);
+                    if (paciente != null && medico != null) {
+                        Internacao internacao = new Internacao(paciente, medico, dataEntrada, numQuarto, valor);
+                        if (!dataSaida.isEmpty()) {
+                            internacao.setDataSaida(dataSaida);
+                        }
+                        internacoes.add(internacao);
+                    }
+                }
+            }
+        } catch (IOException e){
+            System.out.println("Erro ao carregar internações: " + e.getMessage());
+        }
+    }
+
+    public static void carregarPlanos(){
+        try{
+            List<String> linhas = Files.readAllLines(Paths.get("Dados/Planos.csv"));
+            for (int i = 1; i < linhas.size(); i++) {
+                String linha = linhas.get(i);
+                String[] dados = linha.split(",");
+                if (dados.length >= 2) {
+                    String nome = dados[0].trim();
+                    String tipo = dados[1].trim();
+                    int descontoInternacao = Integer.parseInt(dados[2].trim());
+                    
+                    PlanoSaude plano = new PlanoSaude(nome, tipo, descontoInternacao);
+                    planos.add(plano);
+                    nomesPlanos.add(nome);
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("Erro ao carregar planos: " + e.getMessage());
         }
     }
 
