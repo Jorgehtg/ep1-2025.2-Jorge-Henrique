@@ -97,9 +97,9 @@ public class Consulta {
 
     public String consultaPaciente(){
         if (status.equalsIgnoreCase("CONCLUIDA")){
-            return String.format("[Dr. %s,%s,%s,%s,%s,%s,%s,%s,%d]",medico.getNome(),medico.getCRM(), this.data, this.hora, this.local, this.status, this.diagnostico, prescricao, medico.getCustoConsulta());
+            return String.format("[Dr. %s,%s,%s,%s,%s,%s,%s,%s,%d]",medico.getNome(),medico.getCrm(), this.data, this.hora, this.local, this.status, this.diagnostico, prescricao, medico.getCustoConsulta());
         }else{
-            return String.format("[Dr. %s,%s,%s,%s,%s,%s]", medico.getNome(),medico.getCRM(), this.data, this.hora, this.local, this.status);
+            return String.format("[Dr. %s,%s,%s,%s,%s,%s]", medico.getNome(),medico.getCrm(), this.data, this.hora, this.local, this.status);
         }
     }
 
@@ -110,7 +110,7 @@ public class Consulta {
     @Override
     public String toString(){
         if (!status.equalsIgnoreCase("CONCLUIDA")){
-            return String.format("%s,%s,%s,%s,%s,%s,%s,%s", paciente.getNome(), paciente.getCpf(), medico.getNome(), medico.getCRM(), data, hora, local, status);
+            return String.format("%s,%s,%s,%s,%s,%s,%s,%s", paciente.getNome(), paciente.getCpf(), medico.getNome(), medico.getCrm(), data, hora, local, status);
         }
         return String.format("%s,%s,%s,%s,%s,%s,%s,%s", paciente.getNome(), medico.getNome(), data, hora, local, status, diagnostico, prescricao.prescricaoConsulta());
     }

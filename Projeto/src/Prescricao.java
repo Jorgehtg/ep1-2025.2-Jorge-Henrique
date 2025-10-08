@@ -35,6 +35,6 @@ public class Prescricao{
 
     @Override
     public String toString(){
-        return "Prescrição: " + medico.getNome() + "(CRM: " + medico.getCRM() + ") " + remedio;
+        return "Prescrição: " + medico.getNome() + "(CRM: " + medico.getCrm() + ") " + remedio;
     }
 }

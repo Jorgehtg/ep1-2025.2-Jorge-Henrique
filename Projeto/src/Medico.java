@@ -8,18 +8,10 @@ public class Medico{
     private double custoConsulta;
     private List<String> agenda;
 
-    public Medico(String nome, String crm, String especialidade, double custo){//medico com especialidade
+    public Medico(String nome, String crm, String especialidade, double custo){
         this.nome = nome;
         this.crm = crm;
         this.especialidade = especialidade;
-        this.custoConsulta = custo;
-        this.agenda = new ArrayList<>();
-    }
-
-    public Medico(String nome, String crm, double custo){//medico sem especialidade
-        this.nome = nome;
-        this.crm = crm;
-        this.especialidade = "Clinico Geral";
         this.custoConsulta = custo;
         this.agenda = new ArrayList<>();
     }
@@ -32,7 +24,7 @@ public class Medico{
         this.nome = nome;
     }
 
-    public String getCRM(){
+    public String getCrm(){
         return this.crm;
     }
 
