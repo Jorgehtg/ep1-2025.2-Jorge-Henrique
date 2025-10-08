@@ -170,40 +170,33 @@ public class GerenciamentoHospitalar{
 
     public static void cancelarConsultaPaciente(Scanner input){
         String cpf = validarCpf(input);
+        if (!cpfs.contains(cpf)){
+        }
         List<Consulta> consultasPaciente = new ArrayList<>();
-
         for (int i = 0; i < consultas.size(); i ++){
             Consulta consulta = consultas.get(i);
             if (consulta.getPaciente().getCpf().equalsIgnoreCase(cpf) && consulta.getStatus().equalsIgnoreCase("AGENDADA")){
-                System.out.printf("%d. Dr. %s %s - Dia %s às %s\n", i+1, consulta.getMedico().getNome(), consulta.getMedico().getCRM(), consulta.getData(), consulta.getHora());
+                System.out.printf("%d) Dr. %s %s - Dia %s às %s\n", i+1, consulta.getMedico().getNome(), consulta.getMedico().getCrm(), consulta.getData(), consulta.getHora());
                 consultasPaciente.add(consulta);
             }
         }
-
         if (consultasPaciente.isEmpty()){
             System.out.println("Sem consultas marcadas");
             return;
         }
-
         while (true){
-            System.out.println("Qual dessas deseja cancelar? (Digite o numero ou 0 para cancelar a operação)");
+            System.out.println("Digite o número da consulta que gostaria de cancelar (0 para cancelar a operação)");
             if (!input.hasNextInt()){
                 System.out.println("Digite um numero valido");
                 input.nextLine();
             }
-
             int escolha = validarInt(input);
-
-            if (escolha == 0){
-                return;
-            }
-
-            if (escolha >= 1 && escolha <= consultas.size()) {
+            if (escolha == 0)return;
+            if (escolha >= 1 && escolha <= consultas.size()){
                 Consulta consultaCancelar = consultas.get(escolha - 1);
                 consultaCancelar.setStatus("CANCELADA");
                 consultaCancelar.getMedico().removerAtendimento(consultaCancelar);
                 //atualizarArquivoConsultas(consultaCancelar);
-                    
                 System.out.println("Consulta cancelada com sucesso!");
                 return;
             } else{
@@ -221,7 +214,6 @@ public class GerenciamentoHospitalar{
                 temConsultas = true;
             }
         }
-
         if (!temConsultas){
             System.out.println("Você não tem consultas agendadas");
         }
@@ -256,10 +248,198 @@ public class GerenciamentoHospitalar{
     }
 
 
+
+    public static void modoMedico(Scanner input){
+        while(true){
+            System.out.println("=============== MODO MEDICO ================");
+            System.out.println("Cadastrar Medico - 1");
+            System.out.println("Concluir Consulta - 2");
+            System.out.println("Cancelar Consulta - 3");
+            System.out.println("Checar agenda de consultas - 4");
+            System.out.println("Internar um paciente - 5");
+            System.out.println("Finalizar uma internação - 6");
+            System.out.println("Checar seus pacientes internados - 7");
+            System.out.println("Voltar a tela anterior - 0");
+            System.out.println("============================================");
+            
+            int valor = validarInt(input);
+
+            switch (valor){
+                case 1:
+                    System.out.println("============================================");
+                    cadastrarMedico(input);
+                    System.out.println("============================================\n");
+                    break;
+                case 2:
+                    System.out.println("============================================");
+                    concluirConsulta(input);
+                    System.out.println("============================================\n");
+                    break;
+                case 3:
+                    System.out.println("============================================");
+                    cancelarConsultaMedico(input);
+                    System.out.println("============================================\n");
+                    break;
+                case 4:
+                    System.out.println("============================================");
+                    //checarAgenda(input);
+                    System.out.println("============================================\n");
+                    break;
+                case 5:
+                    System.out.println("============================================");
+                    //internarPaciente(input);
+                    System.out.println("============================================\n");
+                    break;
+                case 6:
+                    System.out.println("============================================");
+                    //finalizarInternacao(input);
+                    System.out.println("============================================\n");
+                    break;
+                case 7:
+                    System.out.println("============================================");
+                    //pacientesInternados(input);
+                    System.out.println("============================================\n");
+                    break;
+                case 0:
+                    return;
+                default:
+                    System.out.println("Digite uma opção valida");
+            }
+        }
+    }
+
+    public static void cadastrarMedico(Scanner input){
+        System.out.print("Digite o nome do medico: ");
+        String nome = input.nextLine();
+
+        String crm = validarCrm(input);
+        if (crms.contains(crm)){
+            System.out.println("Medico já cadastrado");
+            return;
+        }
+
+        System.out.println("O medico tem especialidade? [S/N]");
+        String resposta = validarResposta(input);
+        String especialidade;
+        if (resposta.equals("S")){
+            System.out.print("Digite a especialidade: ");
+            especialidade = input.nextLine().toLowerCase();
+        } else{
+            especialidade = "clinico geral";
+        }
+        System.out.print("Digite o valor cobrado pela consulta: ");
+        double preco = validarDouble(input);
+        Medico medico = new Medico(nome, crm, especialidade, preco);
+        medicos.add(medico);
+        crms.add(crm);
+        if (!especialidades.contains(especialidade)){
+            especialidades.add(especialidade);
+        }
+        //salvarMedico()
+        System.out.println("Medico cadastrado");
+        return;
+    }
+
+    public static void concluirConsulta(Scanner input){
+        String crm = validarCrm(input);
+        if (!crms.contains(crm)){
+            System.out.println("Medico não encontrado");
+            return;
+        }
+        Medico medico = buscarMedicoPeloCrm(crm);
+        String cpf = validarCpf(input);
+        if (!cpfs.contains(cpf)){
+            System.out.println("Paciente não encontrado");
+            return;
+        }
+        Paciente paciente = buscarPacientePeloCpf(cpf);
+        List<Consulta> consultasAgendadas = new ArrayList<>();
+        int i = 1;
+        for (Consulta consulta : consultas){
+            if (consulta.getMedico().getCrm().equals(crm) && consulta.getPaciente().getCpf().equals(cpf) && consulta.getStatus().equals("AGENDADA")){
+                consultasAgendadas.add(consulta);
+                System.out.printf("%d) Paciente: %s - Data: %s - Hora: %s\n", i, consulta.getPaciente().getNome(), consulta.getData(), consulta.getHora());
+                i++;
+            }
+        }
+        if (consultasAgendadas.isEmpty()){
+            System.out.println("Nenhuma consulta agendada com este paciente");
+            return;
+        }
+        System.out.print("Digite o número da consulta que deseja concluir (ou 0 para cancelar a operação): ");
+        int escolha;
+        while (true){
+            escolha = validarInt(input);
+            if (escolha == 0) return;
+            if (escolha < 1 || escolha > consultasAgendadas.size()){
+                System.out.println("Digite um número valido");
+                continue;
+            }
+            break;
+        }
+        Consulta consulta = consultasAgendadas.get(escolha - 1);
+        System.out.print("Digite o diagnostico: ");
+        String diagnostico = input.nextLine();
+        System.out.println("Tem prescrição? [S/N]");
+        String resposta = validarResposta(input);
+        if (resposta.equals("S")){
+            System.out.print("Digite o nome do remedio: ");
+            String remedio = input.nextLine();
+            System.out.print("Digite a quantidade de dias que o remedio deve ser consumido: ");
+            int dias = validarInt(input);
+            Prescricao prescricao = new Prescricao(medico, remedio, dias);
+            consulta.concluirConsulta(diagnostico, prescricao);
+            //atualizarArquivoConsulta();
+            //atualizarListaConsulta();
+            System.out.println("Consulta concluida");
+            return;     
+        }
+        consulta.concluirConsulta(diagnostico, null);
+    }
+
+    public static void cancelarConsultaMedico(Scanner input){
+        String crm = validarCrm(input);
+        if (!crms.contains(crm)){
+            System.out.println("Medico não encontrado");
+            return;
+        }
+        int i = 1;
+        List<Consulta> consultasAgendadas = new ArrayList<>();
+        for (Consulta consulta : consultas){
+            if (consulta.getMedico().getCrm().equals(crm) && consulta.getStatus().equals("AGENDADA")){
+                consultasAgendadas.add(consulta);
+                System.out.printf("%d) Paciente: %s - Data: %s - Hora: %s\n", i, consulta.getPaciente().getNome(), consulta.getData(), consulta.getHora());
+                i++;
+            }
+        }
+        if (consultasAgendadas.isEmpty()){
+            System.out.println("Nenhuma consulta agendada");
+            return;
+        }
+        int escolha;
+        while (true){
+            System.out.print("Digite o número da consulta que gostaria de cancelar (0 para cancelar a operação): ");
+            escolha = validarInt(input);
+            if(escolha == 0) return;
+            if(escolha < 1 || escolha > consultasAgendadas.size()){
+                System.out.println("Digite um número valido");
+                continue;
+            }
+            break;
+        }
+        Consulta consulta = consultasAgendadas.get(escolha-1);
+        consulta.setStatus("CANCELADA");
+        consulta.getMedico().removerAtendimento(consulta);
+        //atualizarArquivoConsultas(consultaCancelar);
+        return;
+    }
+
+
     public static void pacienteComPlano(Scanner input, String nome, String cpf, int idade){
         while (true){
             System.out.print("Digite o nome do plano: ");
             String nomePlano = input.nextLine().toLowerCase();
+
             if (nomesPlanos.contains(nomePlano)){
                 PlanoSaude plano = buscarPlanoPeloNome(nomePlano);
                 PacienteEspecial paciente = new PacienteEspecial(nome, cpf, idade, plano);
@@ -267,6 +447,7 @@ public class GerenciamentoHospitalar{
                 cpfs.add(cpf);
                 //salvarPaciente;
                 return;
+
             } else{
                 System.out.println("Parece que não trabalhamos com esse plano, gostaria de tentar outro? [S/N]");
                 String resposta = validarResposta(input);
@@ -288,14 +469,14 @@ public class GerenciamentoHospitalar{
             for (Medico medico : medicos){
                 if (medico.getEspecialidade().equalsIgnoreCase(especialidade)){
                     medicosEspecialidade.add(medico);
-                    System.out.printf("%d. Dr %s %s - Especialidade: %s - Preço da consulta: %.2fR$\n", i, medico.getNome(), medico.getCRM(), medico.getEspecialidade(), medico.getCustoConsulta());
+                    System.out.printf("%d) Dr %s %s - Especialidade: %s - Preço da consulta: %.2fR$\n", i, medico.getNome(), medico.getCrm(), medico.getEspecialidade(), medico.getCustoConsulta());
                     i++;
                 }
             }
         }else{
             for(Medico medico : medicos){
                 medicosEspecialidade.add(medico);
-                System.out.printf("%d. Dr %s %s - Especialidade: %s - Preço da consulta: %.2fR$\n", i, medico.getNome(), medico.getCRM(), medico.getEspecialidade(), medico.getCustoConsulta());
+                System.out.printf("%d) Dr %s %s - Especialidade: %s - Preço da consulta: %.2fR$\n", i, medico.getNome(), medico.getCrm(), medico.getEspecialidade(), medico.getCustoConsulta());
                 i++;
             }
 
@@ -305,10 +486,9 @@ public class GerenciamentoHospitalar{
             System.out.println("Não temos medicos dessa especialidade no momento");
             return;
         }
-            
+
         System.out.println("Qual medico você gostaria? (Digite o numero ou 0 para sair)");
         int numEscolhido;
-            
         while(true){
             numEscolhido = validarInt(input); 
             if (numEscolhido == 0) return;
@@ -318,7 +498,7 @@ public class GerenciamentoHospitalar{
             }
             break;
         }
-            
+
         Medico medico = medicosEspecialidade.get(numEscolhido-1);
 
         System.out.println("Digite a data da consulta (Formato DD/MM/AAAA): ");
@@ -355,6 +535,15 @@ public class GerenciamentoHospitalar{
         return null;
     }
 
+    public static Medico buscarMedicoPeloCrm(String crm){
+        for(Medico medico : medicos){
+            if (medico.getCrm().equals(crm)){
+                return medico;
+            }
+        }
+        return null;
+    }
+
 
     //validadores
     public static String validarCpf(Scanner input){
@@ -386,7 +575,6 @@ public class GerenciamentoHospitalar{
                 input.nextLine();
             }
         }
-
     }
 
     public static String validarResposta(Scanner input){
@@ -476,6 +664,38 @@ public class GerenciamentoHospitalar{
                 continue;
             }
             return hora;
+        }
+    }
+
+    public static String validarCrm(Scanner input){
+        System.out.print("Digite o crm (Formato CRM/XX 000000): ");
+        String crm = "";
+        while (true){
+            crm = input.nextLine().trim().toUpperCase();
+
+            if (!crm.matches("CRM/[A-Z]{2}\\s\\d{6}")){
+                System.out.println("Formato invalido! Use CRM/XX 000000");
+                continue;
+            }
+            return crm;
+        }
+    }
+
+    public static double validarDouble(Scanner input){
+        double valor;
+        while (true){
+            if (input.hasNextDouble()){
+                valor = input.nextDouble();
+                input.nextLine();
+                if (valor >= 0){
+                    return valor;
+                } else{
+                    System.out.println("Digite um valor positivo");
+                }
+            } else{
+                System.out.println("Digite apenas números");
+                input.nextLine();
+            }
         }
     }
 
