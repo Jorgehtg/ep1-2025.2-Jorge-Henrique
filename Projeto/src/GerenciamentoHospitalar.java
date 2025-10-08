@@ -508,6 +508,78 @@ public class GerenciamentoHospitalar{
         return;
     }
 
+    public static void modoAdministrativo(Scanner input){
+        while (true){
+            System.out.println("========= MODO ADMINISTRATIVO =========");
+            System.out.println("Cadastrar Plano - 1");
+            System.out.println("Cadastrar Paciente - 2");
+            System.out.println("Cadastrar Medico - 3");
+            System.out.println("Checar Internações ativas - 4");
+            System.out.println("Checar Pacientes - 5");
+            System.out.println("Checar Medicos - 6");
+            System.out.println("Checar Consultas - 7");
+            System.out.println("Checar Estatiticas Gerais - 8");
+            System.out.println("Checar Plano de Saude - 9");
+            System.out.println("Voltar a tela anterior - 0");
+            System.out.println("============================================");
+
+            int valor = validarInt(input);
+
+            switch (valor){
+                case 1:
+                    System.out.println("============================================");
+                    //cadastrarPlano(input);
+                    System.out.println("============================================\n");
+                    break;
+                case 2:
+                    System.out.println("============================================");
+                    cadastrarPaciente(input);
+                    System.out.println("============================================\n");
+                    break;
+                case 3:
+                    System.out.println("============================================");
+                    cadastrarMedico(input);
+                    System.out.println("============================================\n");
+                    break;
+                case 4:
+                    System.out.println("============================================");
+                    //checarInternacoes(input);
+                    System.out.println("============================================\n");
+                    break;
+                case 5: 
+                    System.out.println("============================================");
+                    //checarPaciente(input);
+                    System.out.println("============================================\n");
+                    break;
+                case 6:
+                    System.out.println("============================================");
+                    //checarMedicos(input);
+                    System.out.println("============================================\n");
+                    break;
+                case 7:
+                    System.out.println("============================================");
+                    //checarConsultas(input);
+                    System.out.println("============================================\n");
+                    break;
+                case 8:
+                    System.out.println("============================================");
+                    //checarEstatisticas(input);
+                    System.out.println("============================================\n");
+                    break;
+                case 9:
+                    System.out.println("============================================");
+                    //checarPlanos(input);
+                    System.out.println("============================================\n");
+                    break;
+                case 0:
+                    return;
+                default:
+                    System.out.println("Digite uma opção valida");
+            }
+
+        }
+    }
+
 
     public static void pacienteComPlano(Scanner input, String nome, String cpf, int idade){
         while (true){
