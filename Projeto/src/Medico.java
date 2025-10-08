@@ -84,6 +84,10 @@ public class Medico{
             } 
             return true;
     }
+
+    public String relatorio(int numeroDeConsultas){
+        return String.format("%s - %s - %s - %s - %d", nome, crm, especialidade, agenda, numeroDeConsultas);
+    }
     
     //escrever no arquivo dos medicos
     @Override

@@ -108,6 +108,14 @@ public class Consulta {
         return String.format("%s; %s; %s; %s", paciente.getNome(), this.data, this.hora, this.local);
     }
 
+    public String relatorio(){
+        if (!status.equalsIgnoreCase("CONCLUIDA")){
+            return String.format("%s - %s %s - %s - %s - %s - %s", paciente.getNome(), medico.getNome(), medico.getCrm(), data, hora, local, status);
+        }
+        return String.format("%s - %s %s - %s - %s - %s - %s - %s - %s", paciente.getNome(), medico.getNome(), medico.getCrm(), data, hora, local, status, diagnostico, prescricao.prescricaoConsulta());
+
+    }
+
     @Override
     public String toString(){
         if (!status.equalsIgnoreCase("CONCLUIDA")){

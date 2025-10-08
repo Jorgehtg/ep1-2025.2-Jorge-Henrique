@@ -74,6 +74,10 @@ public class Paciente{
         return precoOriginal;
     }
 
+    public String relatorio(){
+        return String.format("%s - %s - %d - %s - %s - %s", nome, cpf, idade, plano.getNome(), consultas, internacoes);
+    }
+
     @Override
     public String toString(){
         return String.format("%s,%s,%d,%s,%s,%s", nome, cpf, idade, plano.getNome(), consultas, internacoes);

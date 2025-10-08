@@ -59,4 +59,8 @@ public class Internacao {
         this.dataSaida = dataSaida;
     }
 
+    public String relatorio(){
+        return String.format("%s - %s %s - %s - %d", paciente.getNome(), medico.getNome(), medico.getCrm(), dataEntrada, numQuarto);
+    }
+
 }
