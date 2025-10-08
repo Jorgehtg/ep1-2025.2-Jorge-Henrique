@@ -120,6 +120,10 @@ public class GerenciamentoHospitalar{
         String nome = validarEntrada(input);
 
         String cpf = validarCpf(input);
+        if(cpfs.contains(cpf)){
+            System.out.println("Paciente já cadastrado");
+            return;
+        }
 
         System.out.printf("Digite a idade do paciente: ");
         int idade = validarInt(input);
@@ -893,7 +897,7 @@ public class GerenciamentoHospitalar{
         medico.addAtendimento(consulta);
         salvarConsulta(consulta);
         atualizarArquivoMedico(medico);
-        System.out.printf("Consulta marcada para %s às %s com Dr. %s", data, hora, medico.getNome());
+        System.out.printf("Consulta marcada para %s às %s com Dr. %s\n", data, hora, medico.getNome());
     }
 
     //buscadores
@@ -1311,8 +1315,6 @@ public class GerenciamentoHospitalar{
                     }
                 }
             }
-            System.out.println("Médicos carregados: " + medicos.size());
-            System.out.println("Especialidades carregadas: " + especialidades.size());  
         } catch (IOException e){
             System.out.println("Erro ao carregar médicos: " + e.getMessage());
         } 
