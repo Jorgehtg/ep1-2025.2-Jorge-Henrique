@@ -24,14 +24,14 @@ public class PacienteEspecial extends Paciente{
         }
 
         int index = especialidadesPlano.indexOf(especialidade);
-        List<Integer> descontosNormais = plano.getDescontosEspecialidades();
-        List<Integer> descontosIdosos = plano.getDescontoIdoso();
+        List<Double> descontosNormais = plano.getDescontosNormais();
+        List<Double> descontosIdosos = plano.getDescontosIdosos();
 
         if (descontosNormais == null || index >= descontosNormais.size()){
             return precoOriginal;
         }
 
-        int porcentagemDesconto;
+        Double porcentagemDesconto;
 
         if (this.isIdoso() && descontosIdosos != null){
             porcentagemDesconto = descontosIdosos.get(index);
@@ -57,7 +57,7 @@ public class PacienteEspecial extends Paciente{
             }
         }
 
-        int descontoInternacao = plano.getDescontoInternacao();
+        double descontoInternacao = plano.getDescontoInternacao();
         double custoTotal = custoDiario * dias;
         double desconto = custoTotal * (descontoInternacao/100.0);
 

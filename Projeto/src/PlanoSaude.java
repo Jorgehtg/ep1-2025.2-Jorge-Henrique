@@ -5,28 +5,27 @@ public class PlanoSaude {
     private String nome;
     private String tipo;
     private List<String> especialidades;
-    private List<Integer> descontoEspecialidade;
-    private List<Integer> descontoIdoso;
-    private int descontoInternacao;
+    private List<Double> descontosNormais;
+    private List<Double> descontosIdosos;
+    private double descontoInternacao;
 
 
     public PlanoSaude(){//criação padrão para escrever no arquivo de quem não tem plano
         this.nome = "PARTICULAR";
         this.tipo = "PARTICULAR";
         this.descontoInternacao = 0;
+        this.especialidades = new ArrayList<>();
+        this.descontosNormais = new ArrayList<>();
+        this.descontosIdosos = new ArrayList<>();
     }
 
-    public PlanoSaude(String nome, String tipo, int desconto){
+    public PlanoSaude(String nome, String tipo, double descontoInternacao){
         this.nome = nome;
         this.tipo = tipo;
-        if(!nome.equalsIgnoreCase("PARTICULAR")){
-            this.especialidades = new ArrayList<>();
-            this.descontoEspecialidade = new ArrayList<>();
-            this.descontoIdoso = new ArrayList<>();
-            this.descontoInternacao = desconto;
-        }else{
-            this.descontoInternacao = 0;
-        }
+        this.especialidades = new ArrayList<>();
+        this.descontosNormais = new ArrayList<>();
+        this.descontosIdosos = new ArrayList<>();
+        this.descontoInternacao = descontoInternacao;
     }
 
     public String getNome(){
@@ -46,83 +45,84 @@ public class PlanoSaude {
     }
 
     public List<String> getEspecialidades(){
-        return this.especialidades;
+        return new ArrayList<>(this.especialidades);
     }
 
     public void setEspescialidades(List<String> especialidades){
         if(!nome.equalsIgnoreCase("PARTICULAR")){
-            this.especialidades = especialidades;
+            this.especialidades = new ArrayList<>(especialidades);
         }
     }
 
-    public void addEspecialidade(String especialidade){
-        if(!nome.equalsIgnoreCase("PARTICULAR")){
-            this.especialidades.add(especialidade);
+    public List<Double> getDescontosNormais(){
+        return new ArrayList<>(this.descontosNormais);
+    }
+
+    public void setDescontosNormais(List<Double> descontosNormais){
+        if (!nome.equalsIgnoreCase("PARTICULAR")){
+            this.descontosNormais = new ArrayList<>(descontosNormais);
         }
     }
 
-    public List<Integer> getDescontosEspecialidades(){
-        return this.descontoEspecialidade;
+    public List<Double> getDescontosIdosos() {
+        return new ArrayList<>(this.descontosIdosos);
     }
 
-    public void setDescontoEspecialidade(List<Integer> descontoEspecialidade){
-        if(!nome.equalsIgnoreCase("PARTICULAR")){
-            this.descontoEspecialidade = descontoEspecialidade;
+    public void setDescontosIdosos(List<Double> descontosIdosos){
+        if (!nome.equalsIgnoreCase("PARTICULAR")){
+            this.descontosIdosos = new ArrayList<>(descontosIdosos);
         }
     }
 
-    public void addDescontoEspecialidade(int desconto){
-        if(!nome.equalsIgnoreCase("PARTICULAR")){
-            this.descontoEspecialidade.add(desconto);
-        }
-    }
-
-    public List<Integer> getDescontoIdoso(){
-        return this.descontoIdoso;
-    }
-
-    public void setDescontoIdoso(List<Integer> descontoIdoso){
-        if(!nome.equalsIgnoreCase("PARTICULAR")){
-            this.descontoIdoso = descontoIdoso;
-        }
-    }
-
-    public void addDescontoIdoso(int desconto){
-        if(!nome.equalsIgnoreCase("PARTICULAR")){
-            this.descontoIdoso.add(desconto);
-        }
-    }
-
-    public int getDescontoInternacao(){
+    public double getDescontoInternacao() {
         return this.descontoInternacao;
     }
 
-    public void setDescontoInternacao(int desconto){
-        this.descontoInternacao = desconto;
+    public void setDescontoInternacao(double desconto) {
+        if (desconto >= 0 && desconto <= 100) {
+            this.descontoInternacao = desconto;
+        }
     }
 
-    public void addInfos(String especialidade, int descontoNormal, int descontoIdoso){
+    public void addEspecialidade(String especialidade, double descontoNormal, double descontoIdoso){
         if(!nome.equalsIgnoreCase("PARTICULAR")){
-            this.especialidades.add(especialidade);
-            this.descontoEspecialidade.add(descontoNormal);
-            this.descontoIdoso.add(descontoIdoso);
+            this.especialidades.add(especialidade.toLowerCase());
+            this.descontosNormais.add(descontoNormal);
+            this.descontosIdosos.add(descontoIdoso);this.especialidades.add(especialidade.toLowerCase());
         }
     }
 
-    public String addDescontos(){
-        StringBuilder descontos = new StringBuilder();
-        for(String especialidade : especialidades){
-            int i = especialidades.indexOf(especialidade);
-            int desconto = this.descontoEspecialidade.get(i);
-            int descontoIdoso = this.descontoIdoso.get(i);
-
-            descontos.append(String.format("[%s,%d,%d]", especialidade, desconto, descontoIdoso));
-        }
-        return descontos.toString();
+    public double getDescontoNormal(String especialidade){
+        int i = especialidades.indexOf(especialidade.toLowerCase());
+        return descontosNormais.get(i);
     }
+
+    public double getDescontoIdoso(String especialidade){
+        int i = especialidades.indexOf(especialidade.toLowerCase());
+        return descontosIdosos.get(i);
+    }
+
+    public String formartarDescontos(){
+        if(!nome.equalsIgnoreCase("PARTICULAR")){
+            StringBuilder descontos = new StringBuilder();
+            for (int i = 0; i < especialidades.size(); i++) {
+                if (i > 0) descontos.append(";");
+                descontos.append(String.format("[%s,%.1f,%.1f]", 
+                    especialidades.get(i), 
+                    descontosNormais.get(i), 
+                    descontosIdosos.get(i)));
+            } 
+            return descontos.toString();
+        }
+        return "";
+    }
+
     @Override
     public String toString(){
-        return String.format("%s,%s,%s,%d", nome, tipo, addDescontos(), descontoInternacao);
+        if(!nome.equalsIgnoreCase("PARTICULAR")){
+            return String.format("%s,%s,$s,%.2f", nome, tipo, formartarDescontos(), descontoInternacao);
+        }
+        return "";
     }
 
 }    

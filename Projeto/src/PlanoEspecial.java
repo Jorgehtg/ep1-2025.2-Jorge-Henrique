@@ -9,8 +9,8 @@ public class PlanoEspecial extends PlanoSaude {
 
         if (!nome.equalsIgnoreCase("PARTICULAR")){
             this.setEspescialidades(new ArrayList<>());
-            this.setDescontoEspecialidade(new ArrayList<>());
-            this.setDescontoIdoso(new ArrayList<>());
+            this.setDescontosNormais(new ArrayList<>());
+            this.setDescontosIdosos(new ArrayList<>());
         }
     }
 
@@ -20,8 +20,8 @@ public class PlanoEspecial extends PlanoSaude {
 
         if (!nome.equalsIgnoreCase("PARTICULAR")){
             this.setEspescialidades(new ArrayList<>());
-            this.setDescontoEspecialidade(new ArrayList<>());
-            this.setDescontoIdoso(new ArrayList<>());
+            this.setDescontosNormais(new ArrayList<>());
+            this.setDescontosIdosos(new ArrayList<>());
         }
     }
 
