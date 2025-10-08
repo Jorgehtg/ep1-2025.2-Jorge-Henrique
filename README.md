@@ -42,10 +42,10 @@ Desenvolvimento de um sistema de gerenciamento hospitalar utilizando os conceito
 ## Prints da Execução
 
 1. Menu Principal:  
-   ![Menu principal](imgs/Menu principal.png)
+   ![Menu principal](https://github.com/Jorgehtg/ep1-2025.2-Jorge-Henrique/blob/main/imgs/Menu%20principal.png)
 
 2. Cadastro de Médico:  
-   ![Cadastro de Médico](imgs/Cadastro de medico.png)
+   ![Cadastro de Médico](https://github.com/Jorgehtg/ep1-2025.2-Jorge-Henrique/blob/main/imgs/Cadastro%20de%20medico.png)
 
 3. Relatório de ?:  
    ![Inserir Print 3](caminho/do/print3.png)
