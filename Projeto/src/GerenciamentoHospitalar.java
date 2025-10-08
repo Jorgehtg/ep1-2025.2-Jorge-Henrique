@@ -35,7 +35,7 @@ public class GerenciamentoHospitalar{
                     modoMedico(input);
                     break;
                 case 3:
-                    // modoAdministrativo(input);
+                    modoAdministrativo(input);
                     break;
                 case 0:
                     System.out.println("Saindo...");
@@ -101,7 +101,7 @@ public class GerenciamentoHospitalar{
 
     public static void cadastrarPaciente(Scanner input){
         System.out.print("Digite o nome do paciente: ");
-        String nome = input.nextLine().toLowerCase();
+        String nome = validarEntrada(input);
 
         String cpf = validarCpf(input);
 
@@ -300,7 +300,7 @@ public class GerenciamentoHospitalar{
 
     public static void cadastrarMedico(Scanner input){
         System.out.print("Digite o nome do medico: ");
-        String nome = input.nextLine();
+        String nome = validarEntrada(input);
 
         String crm = validarCrm(input);
         if (crms.contains(crm)){
@@ -528,7 +528,7 @@ public class GerenciamentoHospitalar{
             switch (valor){
                 case 1:
                     System.out.println("============================================");
-                    //cadastrarPlano(input);
+                    cadastrarPlano(input);
                     System.out.println("============================================\n");
                     break;
                 case 2:
@@ -580,11 +580,72 @@ public class GerenciamentoHospitalar{
         }
     }
 
+    public static void cadastrarPlano(Scanner input){
+        System.out.print("Digite o nome do plano: ");
+        String nome = validarEntrada(input);
+        if (nomesPlanos.contains(nome.toLowerCase())) {
+            System.out.println("Plano já cadastrado");
+            return;
+        }
+        System.out.println("Digite o tipo do plano: ");
+        String tipo = validarEntrada(input);
+        System.out.println("Digite o valor de desconto por internação (em porcentagem):");
+        int descontoInternacao;
+        while(true){
+            descontoInternacao = validarInt(input);
+            if (descontoInternacao < 0 || descontoInternacao > 100) {
+                System.out.println("Desconto de internação deve estar entre 0% e 100%!");
+                continue;
+            }
+            break;
+        }
+        String[] especialidades;
+        String[] descontosNormais;
+        String[] descontosIdoso;
+        while(true){
+            System.out.println("Digite todas as especialidades presentes no plano separadas por vírgula:");
+            especialidades = validarEntrada(input).split(",");
+            System.out.println("Digite os valores de desconto (em porcentagem) respectivos a cada especialidade separados por vírgula:");
+            descontosNormais = validarEntrada(input).split(",");
+            System.out.println("Digite os valores de desconto para idosos (em porcentagem) respectivos a cada especialidade separados por vírgula:");
+            descontosIdoso = validarEntrada(input).split(",");
+            if (especialidades.length != descontosNormais.length || especialidades.length != descontosIdoso.length) {
+                System.out.println("O número de especialidades deve ser igual ao número de descontos");
+                continue;
+            }
+            break;
+        }
+        System.out.println("É um plano especial? [S/N]");
+        String resposta = validarResposta(input);
+        if (resposta.equals("S")){
+            PlanoEspecial plano = new PlanoEspecial(nome, tipo, descontoInternacao);
+            for(int i = 0; i < descontosNormais.length; i++){
+                double descontoNormal = Double.parseDouble(descontosNormais[i]);
+                double descontoIdoso = Double.parseDouble(descontosIdoso[i]);
+                plano.addDescontos(especialidades[i], descontoNormal, descontoIdoso);
+            }
+            planos.add(plano);
+            //salvarPlano();
+            System.out.println("Plano de Saude especial cadastrado");
+            return;
+        }
+        PlanoSaude plano = new PlanoSaude(nome, tipo, descontoInternacao);
+        for(int i = 0; i < descontosNormais.length; i++){
+                double descontoNormal = Double.parseDouble(descontosNormais[i]);
+                double descontoIdoso = Double.parseDouble(descontosIdoso[i]);
+                plano.addDescontos(especialidades[i], descontoNormal, descontoIdoso);
+            }
+        planos.add(plano);
+        //salvarPlano();
+        System.out.println("Plano de Saude cadastrado");
+        return;
+    }
+
 
     public static void pacienteComPlano(Scanner input, String nome, String cpf, int idade){
         while (true){
             System.out.print("Digite o nome do plano: ");
-            String nomePlano = input.nextLine().toLowerCase();
+            String nomePlano = validarEntrada(input);
 
             if (nomesPlanos.contains(nomePlano)){
                 PlanoSaude plano = buscarPlanoPeloNome(nomePlano);
@@ -673,6 +734,8 @@ public class GerenciamentoHospitalar{
         
         System.out.printf("Consulta marcada para %s às %s com Dr. %s", data, hora, medico.getNome());
     }
+
+    public static void descontosPlano(Scanner input){}
 
 
     //buscadores
@@ -861,6 +924,18 @@ public class GerenciamentoHospitalar{
             } else{
                 System.out.println("Digite apenas números");
                 input.nextLine();
+            }
+        }
+    }
+
+    public static String validarEntrada(Scanner input) {
+        String entrada;
+        while (true) {
+            entrada = input.nextLine().trim().toLowerCase();
+            if (!entrada.isEmpty()) {
+                return entrada;
+            } else {
+                System.out.println("Entrada não pode ser vazia");
             }
         }
     }
