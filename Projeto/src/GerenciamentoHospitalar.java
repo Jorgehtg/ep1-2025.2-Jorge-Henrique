@@ -67,10 +67,10 @@ public class GerenciamentoHospitalar{
             System.out.println("============== MODO PACIENTE ===============");
             System.out.println("Cadastrar paciente - 1");
             System.out.println("Marcar consulta - 2");
-            System.out.println("Cancelar cosnulta - 3");
+            System.out.println("Cancelar consulta - 3");
             System.out.println("Checar consultas marcadas - 4");
-            System.out.println("Checar histórico de consultas - 5");
-            System.out.println("Checar histórico de internações - 6");
+            System.out.println("Checar historico de consultas - 5");
+            System.out.println("Checar historico de internacoes - 6");
             System.out.println("Voltar à tela anterior - 0");
             System.out.println("============================================");
 
