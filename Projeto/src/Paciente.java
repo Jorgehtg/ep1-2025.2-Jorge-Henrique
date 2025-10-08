@@ -7,7 +7,7 @@ public class Paciente{
     private int idade;
     private PlanoSaude plano;
     private List<Consulta> consultas;
-    private List<String> internacoes;
+    private List<Internacao> internacoes;
 
     public Paciente(String nome, String cpf, int idade){
         this.nome = nome;
@@ -58,11 +58,11 @@ public class Paciente{
         this.consultas.add(consulta);
     }
 
-    public List<String> getInternacoes(){
+    public List<Internacao> getInternacoes(){
         return internacoes;
     }
 
-    public void addInternacoes(String internação){
+    public void addInternacoes(Internacao internação){
         this.internacoes.add(internação);
     }
 
