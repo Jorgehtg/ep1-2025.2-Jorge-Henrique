@@ -1,5 +1,9 @@
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
 public class GerenciamentoHospitalar{
@@ -518,8 +522,8 @@ public class GerenciamentoHospitalar{
             System.out.println("Checar Pacientes - 5");
             System.out.println("Checar Medicos - 6");
             System.out.println("Checar Consultas - 7");
-            System.out.println("Checar Estatiticas Gerais - 8");
-            System.out.println("Checar Plano de Saude - 9");
+            System.out.println("Checar Plano de Saude - 8");
+            System.out.println("Checar Estatiticas Gerais - 9");
             System.out.println("Voltar a tela anterior - 0");
             System.out.println("============================================");
 
@@ -543,32 +547,32 @@ public class GerenciamentoHospitalar{
                     break;
                 case 4:
                     System.out.println("============================================");
-                    //checarInternacoes(input);
+                    checarInternacoes();
                     System.out.println("============================================\n");
                     break;
                 case 5: 
                     System.out.println("============================================");
-                    //checarPaciente(input);
+                    checarPacientes();
                     System.out.println("============================================\n");
                     break;
                 case 6:
                     System.out.println("============================================");
-                    //checarMedicos(input);
+                    checarMedicos();
                     System.out.println("============================================\n");
                     break;
                 case 7:
                     System.out.println("============================================");
-                    //checarConsultas(input);
+                    checarConsultas();
                     System.out.println("============================================\n");
                     break;
                 case 8:
                     System.out.println("============================================");
-                    //checarEstatisticas(input);
+                    checarPlanos();
                     System.out.println("============================================\n");
                     break;
                 case 9:
                     System.out.println("============================================");
-                    //checarPlanos(input);
+                    checarEstatisticas();
                     System.out.println("============================================\n");
                     break;
                 case 0:
@@ -640,6 +644,142 @@ public class GerenciamentoHospitalar{
         System.out.println("Plano de Saude cadastrado");
         return;
     }
+
+    public static void checarInternacoes(){
+        try (FileWriter writer = new FileWriter("internacoes_ativas.txt")){
+            writer.write("Nome do paciente - Medico responsavel - Data de começo - Numero do quarto\n");
+            for (Internacao internacao : internacoes) {
+                if (internacao.getDataSaida() == null){
+                    writer.write(internacao.relatorio() + "\n");
+                }
+            }
+            System.out.println("Relatorio exportado com sucesso");
+        } catch (IOException e) {
+            System.out.println("Erro ao exportar arquivo: " + e.getMessage());
+        }
+    }
+
+    public static void checarPacientes(){
+        try (FileWriter writer = new FileWriter("relatorio_pacientes.txt")){
+            writer.write("Nome - CPF - Idade - Plano de Saude - Historico de Consultas - Historico de Internacoes\n");
+            for (Paciente paciente : pacientes){
+                writer.write(paciente.relatorio() + "\n");
+            }
+            System.out.println("Relatorio exportado com sucesso");
+        } catch (IOException e) {
+            System.out.println("Erro ao exportar arquivo: " + e.getMessage());
+        }
+    }
+
+    public static void checarMedicos(){
+        try (FileWriter writer = new FileWriter("relatorio_medicos.txt")){
+            writer.write("Nome - CRM - Especialidade - Historico de Consultas - Numero de Consultas Realizadas\n");
+            for(Medico medico : medicos){
+                int numConsultas = 0;
+                for(Consulta consulta : consultas){
+                    if(consulta.getStatus().equals("CONCLUIDA") && consulta.getMedico().getCrm().equals(medico.getCrm())) numConsultas++;
+                }
+                writer.write(medico.relatorio(numConsultas) + "\n");
+            }
+            System.out.println("Relatorio exportado com sucesso");
+        } catch(IOException e){
+            System.out.println("Erro: " + e.getMessage());
+        }
+    }
+
+    public static void checarConsultas(){
+        try (FileWriter writer = new FileWriter("relatorio_consultas.txt")){
+            writer.write("Paciente - Medico - Data - Hora - Local - Status - Diagnostico - Prescricao\n");
+            for(Consulta consulta : consultas){
+                if(!consulta.getStatus().equals("CANCELADA")){
+                    writer.write(consulta.relatorio() + "\n");
+                }
+            }
+            System.out.println("Relatorio exportado com sucesso");
+        } catch(IOException e){
+            System.out.println("Erro: " + e.getMessage());
+        }
+    }
+
+    public static void checarPlanos() {
+        try (FileWriter writer = new FileWriter("relatorio_planos.txt")){
+            writer.write("Plano de Saude - Valor Economizado\n");
+            Map<String, Double> economiaPorPlano = new HashMap<>();
+            for (Consulta consulta : consultas){
+                if (!consulta.getStatus().equalsIgnoreCase("CONCLUIDA")) continue;
+                Paciente paciente = consulta.getPaciente();
+                if (!(paciente instanceof PacienteEspecial)) continue;
+                PlanoSaude plano = ((PacienteEspecial) paciente).getPlano();
+                if (plano == null) continue;
+                String especialidade = consulta.getMedico().getEspecialidade();
+                double valorBase = consulta.getMedico().getCustoConsulta();
+                double descontoPercentual;
+                if (paciente.isIdoso()){
+                    descontoPercentual = plano.getDescontoIdoso(especialidade);
+                } else{
+                    descontoPercentual = plano.getDescontoNormal(especialidade);
+                }
+                double economia = valorBase * (descontoPercentual / 100.0);
+                economiaPorPlano.put(plano.getNome(), economiaPorPlano.getOrDefault(plano.getNome(), 0.0) + economia);
+            }
+            for (PlanoSaude plano : planos) {
+                double totalEconomizado = economiaPorPlano.getOrDefault(plano.getNome(), 0.0);
+                writer.write(String.format("%s - %.2fR$\n", plano.getNome(), totalEconomizado));
+            }
+            System.out.println("Relatorio exportado com sucesso");        
+        } catch (IOException e){
+            System.out.println("Erro: " + e.getMessage());
+        }
+    }
+
+    public static void checarEstatisticas(){
+        try (FileWriter writer = new FileWriter("estatisticas_gerais.txt")){
+            writer.write("Estaticas Gerais\n");
+            writer.write("Numero de pacients cadastrados: " + pacientes.size() + "\n");
+            writer.write("Numero de medicos cadastrados: " + medicos.size() + "\n");
+            if (!especialidades.isEmpty()){
+                for (String especialidade : especialidades){
+                    int i = 0;
+                    for (Medico medico : medicos){
+                        if (medico.getEspecialidade().equals(especialidade)) i++;
+                    }
+                    writer.write(String.format("Numero de medicos com a %s cadastrados: %d\n", especialidade, i));
+                }
+            }
+            Map<Medico, Integer> consultasPorMedico = new HashMap<>();
+            for (Consulta consulta : consultas) {
+                if (consulta.getStatus().equalsIgnoreCase("CONCLUIDA")) {
+                    Medico medico = consulta.getMedico();
+                    consultasPorMedico.put(medico, consultasPorMedico.getOrDefault(medico, 0) + 1);
+                }
+            }
+            Medico medicoMaisAtendeu = null;
+            int maxConsultas = 0;
+            for (Map.Entry<Medico, Integer> entry : consultasPorMedico.entrySet()) {
+                if (entry.getValue() > maxConsultas) {
+                    maxConsultas = entry.getValue();
+                    medicoMaisAtendeu = entry.getKey();
+                }
+            }
+            if (medicoMaisAtendeu != null) {
+                writer.write(String.format("Medico que mais atendeu: Dr. %s %s com %d consultas\n", medicoMaisAtendeu.getNome(), medicoMaisAtendeu.getCrm(), maxConsultas));
+            }
+            int i = 0;
+            for (Consulta consulta : consultas){
+                if (consulta.getStatus().equals("CONCLUIDA")) i++;
+            }
+            writer.write("Numero de consultas concluidas: " + i + "\n");
+            int j = 0;
+            for(Internacao internacao : internacoes){
+                if (internacao.getDataSaida() == null) j++;
+            }
+            writer.write("Numero de internacoes ativas no momento: " + j + "\n");
+            System.out.println("Relatorio exportado com sucesso"); 
+        } catch (IOException e) {
+            System.out.println("Erro: " + e.getMessage());
+        }
+    }
+
 
 
     public static void pacienteComPlano(Scanner input, String nome, String cpf, int idade){
