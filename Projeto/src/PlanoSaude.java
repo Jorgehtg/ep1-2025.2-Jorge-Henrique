@@ -120,7 +120,7 @@ public class PlanoSaude {
     @Override
     public String toString(){
         if(!nome.equalsIgnoreCase("PARTICULAR")){
-            return String.format("%s,%s,$s,%.2f", nome, tipo, formartarDescontos(), descontoInternacao);
+            return String.format("%s,%s,%s,%.2f", nome, tipo, formartarDescontos(), descontoInternacao);
         }
         return "";
     }
