@@ -15,15 +15,6 @@ public class Internacao {
         this.valorInternação = valor;
     }
 
-    public Internacao(Paciente paciente, Medico medico, String dataEntrada, String dataSaida, int numQuarto, double valor){//paciente já liberado
-        this.paciente = paciente;
-        this.medico = medico;
-        this.dataEntrada = dataEntrada;
-        this.dataSaida = dataSaida;
-        this.numQuarto = numQuarto;
-        this.valorInternação = valor;
-    }
-
     public Paciente getPaciente(){
         return this.paciente;
     }
@@ -64,5 +55,8 @@ public class Internacao {
         this.valorInternação = valorInternação;
     }
 
+    public void finalizarInternacao(String dataSaida){
+        this.dataSaida = dataSaida;
+    }
 
 }
