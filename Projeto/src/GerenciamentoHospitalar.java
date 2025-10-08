@@ -1,14 +1,10 @@
-import java.nio.file.Paths;
-import java.nio.file.Files;
-import java.io.IOException;
-import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
-import java.util.Locale;
 
 public class GerenciamentoHospitalar{
     static ArrayList<Paciente> pacientes = new ArrayList<>();
+    static ArrayList<PacienteEspecial> pacientesEspeciais = new ArrayList<>();
     static ArrayList<String> cpfs = new ArrayList<>();
     static ArrayList<Medico> medicos = new ArrayList<>();
     static ArrayList<Medico> gerais = new ArrayList<>();
@@ -17,7 +13,7 @@ public class GerenciamentoHospitalar{
     static ArrayList<PlanoSaude> planos = new ArrayList<>();
     static ArrayList<String> nomesPlanos = new ArrayList<>();
     static ArrayList<Consulta> consultas = new ArrayList<>();
-    static ArrayList<Internacao> internacaos = new ArrayList<>();
+    static ArrayList<Internacao> internacoes = new ArrayList<>();
     public static void main(String[] args){
         Scanner input = new Scanner(System.in);
     
@@ -36,7 +32,7 @@ public class GerenciamentoHospitalar{
                     modoPaciente(input);
                     break;
                 case 2:
-                    //modoMedico(input);
+                    modoMedico(input);
                     break;
                 case 3:
                     // modoAdministrativo(input);
@@ -82,17 +78,17 @@ public class GerenciamentoHospitalar{
                     break;
                 case 4:
                     System.out.println("============================================");
-                    //checarAtendimentosMarcados(input);
+                    checarConsultasMarcadas(input);
                     System.out.println("============================================\n");
                     break;
                 case 5:
                     System.out.println("============================================");
-                    //checarHistoricoConsultas(input);
+                    checarHistoricoConsultas(input);
                     System.out.println("============================================\n");
                     break;
                 case 6:
                     System.out.println("============================================");
-                    //checarHistoricoInternacoes(input);
+                    checarHistoricoInternacoes(input);
                     System.out.println("============================================\n");
                     break;
                 case 0:
@@ -130,16 +126,8 @@ public class GerenciamentoHospitalar{
 
     public static void marcarConsulta(Scanner input){
         String cpf = validarCpf(input);
-        if (!cpfs.contains(cpf)){
-            System.out.println("CPF não encontrado, gostaria de se cadastrar? [S/N]");
-            String res = validarResposta(input);
-            if (res.equals("S")){
-                cadastrarPaciente(input);
-            } else{
-                return;
-            }
-        }
         Paciente paciente = buscarPacientePeloCpf(cpf);
+        if (paciente == null) return;
         System.out.println("Deseja alguma especialidade em especifico? [S/N]");
         String resposta1 = validarResposta(input);
         if (resposta1.equals("S")){
@@ -170,13 +158,13 @@ public class GerenciamentoHospitalar{
 
     public static void cancelarConsultaPaciente(Scanner input){
         String cpf = validarCpf(input);
-        if (!cpfs.contains(cpf)){
-        }
+        Paciente paciente = buscarPacientePeloCpf(cpf);
+        if (paciente == null) return;
         List<Consulta> consultasPaciente = new ArrayList<>();
-        for (int i = 0; i < consultas.size(); i ++){
+        for (int i = 0; i < consultas.size(); i++){
             Consulta consulta = consultas.get(i);
             if (consulta.getPaciente().getCpf().equalsIgnoreCase(cpf) && consulta.getStatus().equalsIgnoreCase("AGENDADA")){
-                System.out.printf("%d) Dr. %s %s - Dia %s às %s\n", i+1, consulta.getMedico().getNome(), consulta.getMedico().getCrm(), consulta.getData(), consulta.getHora());
+                System.out.printf("%d) Dr. %s %s - Dia %s às %s\n",consultasPaciente.size() + 1, consulta.getMedico().getNome(), consulta.getMedico().getCrm(), consulta.getData(), consulta.getHora());
                 consultasPaciente.add(consulta);
             }
         }
@@ -192,8 +180,8 @@ public class GerenciamentoHospitalar{
             }
             int escolha = validarInt(input);
             if (escolha == 0)return;
-            if (escolha >= 1 && escolha <= consultas.size()){
-                Consulta consultaCancelar = consultas.get(escolha - 1);
+            if (escolha >= 1 && escolha <= consultasPaciente.size()){
+                Consulta consultaCancelar = consultasPaciente.get(escolha - 1);
                 consultaCancelar.setStatus("CANCELADA");
                 consultaCancelar.getMedico().removerAtendimento(consultaCancelar);
                 //atualizarArquivoConsultas(consultaCancelar);
@@ -205,8 +193,10 @@ public class GerenciamentoHospitalar{
         }
     }
 
-    public static void checarConsultasAgendadas(Scanner input){
+    public static void checarConsultasMarcadas(Scanner input){
         String cpf = validarCpf(input);
+        Paciente paciente = buscarPacientePeloCpf(cpf);
+        if (paciente == null) return;
         boolean temConsultas = false;
         for (Consulta consulta : consultas){
             if (consulta.getPaciente().getCpf().equals(cpf) && consulta.getStatus().equals("AGENDADA")){
@@ -222,7 +212,7 @@ public class GerenciamentoHospitalar{
     public static void checarHistoricoInternacoes(Scanner input){
         String cpf = validarCpf(input);
         boolean temInternacoes = false;
-        for (Internacao internacao : internacaos){
+        for (Internacao internacao : internacoes){
             if (internacao.getPaciente().getCpf().equals(cpf)){
                 System.out.printf("Médico responsavel: Dr. %s - Data de entrada: %s - Data de Saida: %s - Quarto: %d\n", internacao.getMedico().getNome(), internacao.getDataEntrada(), internacao.getDataSaida(), internacao.getNumQuarto());
                 temInternacoes = true;
@@ -282,22 +272,22 @@ public class GerenciamentoHospitalar{
                     break;
                 case 4:
                     System.out.println("============================================");
-                    //checarAgenda(input);
+                    checarAgendaDeConsultas(input);
                     System.out.println("============================================\n");
                     break;
                 case 5:
                     System.out.println("============================================");
-                    //internarPaciente(input);
+                    internarPaciente(input);
                     System.out.println("============================================\n");
                     break;
                 case 6:
                     System.out.println("============================================");
-                    //finalizarInternacao(input);
+                    finalizarInternacao(input);
                     System.out.println("============================================\n");
                     break;
                 case 7:
                     System.out.println("============================================");
-                    //pacientesInternados(input);
+                    pacientesInternados(input);
                     System.out.println("============================================\n");
                     break;
                 case 0:
@@ -327,7 +317,7 @@ public class GerenciamentoHospitalar{
         } else{
             especialidade = "clinico geral";
         }
-        System.out.print("Digite o valor cobrado pela consulta: ");
+        System.out.print("Digite o valor cobrado pela consulta (Formato 000,00): ");
         double preco = validarDouble(input);
         Medico medico = new Medico(nome, crm, especialidade, preco);
         medicos.add(medico);
@@ -342,21 +332,13 @@ public class GerenciamentoHospitalar{
 
     public static void concluirConsulta(Scanner input){
         String crm = validarCrm(input);
-        if (!crms.contains(crm)){
-            System.out.println("Medico não encontrado");
-            return;
-        }
         Medico medico = buscarMedicoPeloCrm(crm);
+        if (medico == null) return;
         String cpf = validarCpf(input);
-        if (!cpfs.contains(cpf)){
-            System.out.println("Paciente não encontrado");
-            return;
-        }
-        Paciente paciente = buscarPacientePeloCpf(cpf);
         List<Consulta> consultasAgendadas = new ArrayList<>();
         int i = 1;
         for (Consulta consulta : consultas){
-            if (consulta.getMedico().getCrm().equals(crm) && consulta.getPaciente().getCpf().equals(cpf) && consulta.getStatus().equals("AGENDADA")){
+            if (consulta.getMedico().getCrm().equals(crm) && consulta.getPaciente().getCpf().equals(cpf) && consulta.getStatus().equalsIgnoreCase("AGENDADA")){
                 consultasAgendadas.add(consulta);
                 System.out.printf("%d) Paciente: %s - Data: %s - Hora: %s\n", i, consulta.getPaciente().getNome(), consulta.getData(), consulta.getHora());
                 i++;
@@ -384,25 +366,29 @@ public class GerenciamentoHospitalar{
         String resposta = validarResposta(input);
         if (resposta.equals("S")){
             System.out.print("Digite o nome do remedio: ");
-            String remedio = input.nextLine();
+            String remedio = input.nextLine().trim();
             System.out.print("Digite a quantidade de dias que o remedio deve ser consumido: ");
             int dias = validarInt(input);
             Prescricao prescricao = new Prescricao(medico, remedio, dias);
             consulta.concluirConsulta(diagnostico, prescricao);
+            medico.removerAtendimento(consulta);
+            consulta.getPaciente().addConsultas(consulta);
             //atualizarArquivoConsulta();
             //atualizarListaConsulta();
             System.out.println("Consulta concluida");
             return;     
         }
         consulta.concluirConsulta(diagnostico, null);
+        medico.removerAtendimento(consulta);
+        consulta.getPaciente().addConsultas(consulta);
+        System.out.println("Consulta concluida");
+        return;
     }
 
     public static void cancelarConsultaMedico(Scanner input){
         String crm = validarCrm(input);
-        if (!crms.contains(crm)){
-            System.out.println("Medico não encontrado");
-            return;
-        }
+        Medico medico = buscarMedicoPeloCrm(crm);
+        if (medico == null) return;
         int i = 1;
         List<Consulta> consultasAgendadas = new ArrayList<>();
         for (Consulta consulta : consultas){
@@ -429,8 +415,96 @@ public class GerenciamentoHospitalar{
         }
         Consulta consulta = consultasAgendadas.get(escolha-1);
         consulta.setStatus("CANCELADA");
-        consulta.getMedico().removerAtendimento(consulta);
+        medico.removerAtendimento(consulta);
         //atualizarArquivoConsultas(consultaCancelar);
+        System.out.println("Consulta cancelada");
+        return;
+    }
+
+    public static void checarAgendaDeConsultas(Scanner input){
+        String crm = validarCrm(input);
+        Medico medico = buscarMedicoPeloCrm(crm);
+        if (medico == null) return;
+        if (medico.getAgenda().isEmpty()){
+            System.out.println("A agenda está vazia");
+        }
+        for (String consulta : medico.getAgenda()){
+            System.out.println(consulta);
+        }
+    }
+
+    public static void internarPaciente(Scanner input){
+        String crm = validarCrm(input);
+        Medico medico = buscarMedicoPeloCrm(crm);
+        if (medico == null) return;
+        String cpf = validarCpf(input);
+        Paciente paciente = buscarPacientePeloCpf(cpf);
+        if (paciente == null) return;
+        System.out.print("Digite a data de entrada (Formato DD/MM/AAAA): ");
+        String dataEntrada = validarData(input);
+        System.out.println("Digite o numero do quarto: ");
+        int numQuarto = validarInt(input);
+        System.out.print("Digite o valor da diaria da internação: ");
+        double valor = validarDouble(input);
+        Internacao internacao = new Internacao(paciente, medico, dataEntrada, numQuarto, valor);
+        internacoes.add(internacao);
+        System.out.println("Paciente internado");
+    }
+
+    public static void finalizarInternacao(Scanner input){
+        String crm = validarCrm(input);
+        Medico medico = buscarMedicoPeloCrm(crm);
+        if (medico == null) return;
+        int i = 1;
+        List<Internacao> internacoesAtivas = new ArrayList<>();
+        for (Internacao internacao : internacoes){
+            if(internacao.getMedico().getCrm().equals(crm) && internacao.getDataSaida() == null){
+                internacoesAtivas.add(internacao);
+                System.out.printf("%d) Paciente: %s - Quarto: %d - Data de inicio: %s\n", i ,internacao.getPaciente().getNome(), internacao.getNumQuarto(), internacao.getDataEntrada());
+                i++;
+            }
+        }
+        if (internacoesAtivas.isEmpty()){
+            System.out.println("Sem internações ativas");
+            return;
+        }
+        int escolhida;
+        while (true){
+            System.out.print("Digite o numero da internaçao que gostaria de finalizar (ou 0 para cancelar a operação): ");
+            escolhida = validarInt(input);
+            if (escolhida == 0){
+                System.out.println("Operação cancelada");
+                return;
+            }
+            if (escolhida < 1 || escolhida > internacoesAtivas.size()){
+                System.out.println("Número invalido");
+            }
+            break;
+        }
+        Internacao internacao = internacoesAtivas.get(escolhida - 1);
+        System.out.print("Digite a data de saida (Formato DD/MM/AAAA): ");
+        String dataSaida = validarData(input);
+        internacao.finalizarInternacao(dataSaida);
+        System.out.printf("Internação finalizada no dia %s", dataSaida);
+        return;        
+    }
+
+    public static void pacientesInternados(Scanner input){
+        String crm = validarCrm(input);
+        Medico medico = buscarMedicoPeloCrm(crm);
+        if (medico == null) return;
+        int i = 1;
+        boolean temPaciente = false;
+        for (Internacao internacao : internacoes){
+            if(internacao.getMedico().getCrm().equals(crm) && internacao.getDataSaida() == null){
+                System.out.printf("%d) Paciente: %s - Quarto: %d - Data de inicio: %s\n", i ,internacao.getPaciente().getNome(), internacao.getNumQuarto(), internacao.getDataEntrada());
+                temPaciente = true;
+                i++;
+            }
+        }
+        if (!temPaciente){
+            System.out.println("Sem pacientes internados");
+        }
         return;
     }
 
@@ -469,25 +543,31 @@ public class GerenciamentoHospitalar{
             for (Medico medico : medicos){
                 if (medico.getEspecialidade().equalsIgnoreCase(especialidade)){
                     medicosEspecialidade.add(medico);
-                    System.out.printf("%d) Dr %s %s - Especialidade: %s - Preço da consulta: %.2fR$\n", i, medico.getNome(), medico.getCrm(), medico.getEspecialidade(), medico.getCustoConsulta());
+                    System.out.printf("%d) Dr %s %s - Especialidade: %s - Preço da consulta: %.2f R$\n", i, medico.getNome(), medico.getCrm(), medico.getEspecialidade(), medico.getCustoConsulta());
                     i++;
                 }
             }
         }else{
             for(Medico medico : medicos){
                 medicosEspecialidade.add(medico);
-                System.out.printf("%d) Dr %s %s - Especialidade: %s - Preço da consulta: %.2fR$\n", i, medico.getNome(), medico.getCrm(), medico.getEspecialidade(), medico.getCustoConsulta());
+                System.out.printf("%d) Dr %s %s - Especialidade: %s - Preço da consulta: %.2f R$\n", i, medico.getNome(), medico.getCrm(), medico.getEspecialidade(), medico.getCustoConsulta());
                 i++;
             }
 
         }
-
-        if(medicosEspecialidade.isEmpty()){
-            System.out.println("Não temos medicos dessa especialidade no momento");
-            return;
+        if(especialidade != null){
+            if(medicosEspecialidade.isEmpty()){
+                System.out.println("Não temos medicos dessa especialidade disponiveis no momento");
+                return;
+            }
+        } else{
+            if(medicosEspecialidade.isEmpty()){
+                System.out.println("Não temos medicos disponiveis no momento");
+                return;
+            }
         }
 
-        System.out.println("Qual medico você gostaria? (Digite o numero ou 0 para sair)");
+        System.out.println("Qual medico você gostaria? (Digite o numero ou 0 cancelar a operação)");
         int numEscolhido;
         while(true){
             numEscolhido = validarInt(input); 
@@ -500,12 +580,19 @@ public class GerenciamentoHospitalar{
         }
 
         Medico medico = medicosEspecialidade.get(numEscolhido-1);
-
-        System.out.println("Digite a data da consulta (Formato DD/MM/AAAA): ");
-        String data = validarData(input);
-
-        System.out.println("Digite o horario da consulta (Formato HH:MM): ");
-        String hora = validarHora(input);
+        String data;
+        String hora;
+        while (true){
+            System.out.println("Digite a data da consulta (Formato DD/MM/AAAA): ");
+            data = validarData(input);
+            System.out.println("Digite o horario da consulta (Formato HH:MM): ");
+            hora = validarHora(input);
+            if(medico.isHorarioLivre(data, hora)){
+                break;
+            } else{
+                System.out.println("Esse horario já está ocupado. Escolha outro");
+            }
+        }
 
         Consulta consulta = new Consulta(paciente, medico, data, hora, "Consultorio");
         consultas.add(consulta);
@@ -526,14 +613,21 @@ public class GerenciamentoHospitalar{
         return null;
     }
 
-    public static Paciente buscarPacientePeloCpf(String cpf){
-        for(Paciente paciente : pacientes){
-            if (paciente.getCpf().equals(cpf)){
+    public static Paciente buscarPacientePeloCpf(String cpf) {
+        for (Paciente paciente : pacientes) {
+            if (paciente.getCpf().equals(cpf)) {
                 return paciente;
             }
         }
+        for (PacienteEspecial paciente : pacientesEspeciais) {
+            if (paciente.getCpf().equals(cpf)) {
+                return paciente;
+            }
+        }
+        System.out.println("Paciente não encontrado");
         return null;
     }
+
 
     public static Medico buscarMedicoPeloCrm(String crm){
         for(Medico medico : medicos){
@@ -541,6 +635,7 @@ public class GerenciamentoHospitalar{
                 return medico;
             }
         }
+        System.out.println("Medico não encotrado");
         return null;
     }
 
@@ -589,9 +684,8 @@ public class GerenciamentoHospitalar{
     }
 
     public static String validarData(Scanner input){
-        String data;
         while(true){
-            data = input.nextLine();
+            String data = input.nextLine();
             if (!data.matches("\\d{2}/\\d{2}/\\d{4}")){
                 System.out.println("Formato invalido");
                 continue;
@@ -650,8 +744,8 @@ public class GerenciamentoHospitalar{
                         continue;
                     }
                 }
-                return data;
             }
+            return data;
         }
     }
 
