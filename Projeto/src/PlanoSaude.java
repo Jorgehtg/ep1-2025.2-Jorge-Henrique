@@ -84,11 +84,11 @@ public class PlanoSaude {
         }
     }
 
-    public void addEspecialidade(String especialidade, double descontoNormal, double descontoIdoso){
+    public void addDescontos(String especialidade, double descontoNormal, double descontoIdoso){
         if(!nome.equalsIgnoreCase("PARTICULAR")){
             this.especialidades.add(especialidade.toLowerCase());
             this.descontosNormais.add(descontoNormal);
-            this.descontosIdosos.add(descontoIdoso);this.especialidades.add(especialidade.toLowerCase());
+            this.descontosIdosos.add(descontoIdoso);
         }
     }
 
