@@ -734,7 +734,7 @@ public class GerenciamentoHospitalar{
 
     public static void checarEstatisticas(){
         try (FileWriter writer = new FileWriter("estatisticas_gerais.txt")){
-            writer.write("Estaticas Gerais\n");
+            writer.write("Estatisticas Gerais\n");
             writer.write("Numero de pacients cadastrados: " + pacientes.size() + "\n");
             writer.write("Numero de medicos cadastrados: " + medicos.size() + "\n");
             if (!especialidades.isEmpty()){
