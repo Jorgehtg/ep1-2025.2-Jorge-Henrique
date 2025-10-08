@@ -64,27 +64,22 @@ public class Medico{
         this.agenda.remove(horarioRemover);
     }
 
-    public boolean isHorarioLivre(int dia, int mes, int ano, int hora, int minutos){
+    public boolean isHorarioLivre(String dataEscolhida, String horaEscolhida){
             if (agenda == null || agenda.isEmpty()){
                 return true;
             }
             for (String atendimentos : agenda){
                 String[] dados = atendimentos.split(";");
+                
+                if(dados.length<3)continue;
 
                 String dataOcupada = dados[1].trim();
                 String horaOcupada = dados[2].trim();
 
-                String[] data = dataOcupada.split("/");
-                String[] horaLista = horaOcupada.split(":");
-
-                String diaS = String.valueOf(dia);
-                String mesS = String.valueOf(mes);
-                String anoS = String.valueOf(ano);
-                String horaS  = String.valueOf(hora);
-                String minutosS = String.valueOf(minutos);
-
-                if (diaS.equals(data[0]) && mesS.equals(data[1]) && anoS.equals(data[2]) && horaS.equals(horaLista[0]) && minutosS.equals(horaLista[1])){
-                    return false;
+                if (dataEscolhida.equalsIgnoreCase(dataOcupada)){
+                    if (horaEscolhida.equalsIgnoreCase(horaOcupada)){
+                        return false;
+                    }
                 }
             } 
             return true;
