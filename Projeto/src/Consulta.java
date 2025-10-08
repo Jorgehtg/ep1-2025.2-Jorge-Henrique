@@ -90,6 +90,7 @@ public class Consulta {
     }
 
     public void concluirConsulta(String diagnostico, Prescricao prescricao){
+        this.status = "CONCLUIDA";
         this.diagnostico = diagnostico;
         this.prescricao = prescricao;
 
