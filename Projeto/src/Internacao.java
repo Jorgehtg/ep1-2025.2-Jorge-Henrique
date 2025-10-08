@@ -63,4 +63,12 @@ public class Internacao {
         return String.format("%s - %s %s - %s - %d", paciente.getNome(), medico.getNome(), medico.getCrm(), dataEntrada, numQuarto);
     }
 
+    @Override
+    public String toString(){
+        if(dataSaida == null){
+            return String.format("%s,%s,%s,%s,%s,%d,%.2f",paciente.getNome(), paciente.getCpf(), medico.getNome(), medico.getCrm(), dataEntrada, numQuarto, valorInternação);
+        }
+        return String.format("%s,%s,%s,%s,%s,%s,%d,%.2f",paciente.getNome(), paciente.getCpf(), medico.getNome(), medico.getCrm(), dataEntrada, dataSaida, numQuarto, valorInternação);
+    }
+
 }
