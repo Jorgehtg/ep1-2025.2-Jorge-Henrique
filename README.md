@@ -47,14 +47,14 @@ Desenvolvimento de um sistema de gerenciamento hospitalar utilizando os conceito
 2. Cadastro de Médico:  
    ![Cadastro de Médico](https://github.com/Jorgehtg/ep1-2025.2-Jorge-Henrique/blob/main/imgs/Cadastro%20de%20medico.png)
 
-3. Relatório de ?:  
-   ![Inserir Print 3](caminho/do/print3.png)
+3. Relatório de Estatísticas:  
+   ![Relatório de Estatísticas](https://github.com/Jorgehtg/ep1-2025.2-Jorge-Henrique/blob/main/imgs/Relatorio%20estatisticas.png)
 
 ---
 
 ## Observações (Extras ou Dificuldades)
 
-- [Espaço para o aluno comentar qualquer funcionalidade extra que implementou, dificuldades enfrentadas, ou considerações importantes.]
+- [Acho que toda essa parte do arquivo de como salvar, atualizar, etc acabou sendo o mais complicado para mim, sem contar os momentos que por estar cansado, ou alguma outra coisa do genero, eu cometia erros bobos. Acho que também teve muitas questões pessoais que acabavam fazendo eu recomeçar tudo ou voltar alguns passos por não achar que estava bom o suficente.]
 
 ---
 
