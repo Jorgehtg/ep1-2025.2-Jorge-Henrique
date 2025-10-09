@@ -921,7 +921,6 @@ public class GerenciamentoHospitalar{
                 return paciente;
             }
         }
-        System.out.println("Paciente não encontrado");
         return null;
     }
 
@@ -932,7 +931,6 @@ public class GerenciamentoHospitalar{
                 return medico;
             }
         }
-        System.out.println("Medico não encotrado");
         return null;
     }
 
@@ -1399,7 +1397,8 @@ public class GerenciamentoHospitalar{
 
     public static void carregarPlanos(){
         try{
-            List<String> linhas = Files.readAllLines(Paths.get("Dados/Planos.csv"));
+            java.nio.file.Path arquivoPath = java.nio.file.Paths.get("Dados/Planos.csv");
+            List<String> linhas = Files.readAllLines(arquivoPath);
             for (int i = 1; i < linhas.size(); i++) {
                 String linha = linhas.get(i);
                 String[] dados = linha.split(",");
