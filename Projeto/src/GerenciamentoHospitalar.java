@@ -465,7 +465,7 @@ public class GerenciamentoHospitalar{
         if (paciente == null) return;
         System.out.print("Digite a data de entrada (Formato DD/MM/AAAA): ");
         String dataEntrada = validarData(input);
-        System.out.println("Digite o numero do quarto: ");
+        System.out.print("Digite o numero do quarto: ");
         int numQuarto = validarInt(input);
         System.out.print("Digite o valor da diaria da internação: ");
         double valor = validarDouble(input);
@@ -939,7 +939,7 @@ public class GerenciamentoHospitalar{
 
     //validadores
     public static String validarCpf(Scanner input){
-        System.out.print("Digite o cpf do paciente (formato 000000000-00): ");
+        System.out.print("Digite o cpf do paciente (Formato 000000000-00): ");
         String cpf;
         while (true){
             cpf = input.nextLine();
@@ -1065,7 +1065,7 @@ public class GerenciamentoHospitalar{
             crm = input.nextLine().trim().toUpperCase();
 
             if (!crm.matches("CRM/[A-Z]{2}\\s\\d{6}")){
-                System.out.println("Formato invalido! Use CRM/XX 000000");
+                System.out.println("Formato invalido");
                 continue;
             }
             return crm;
