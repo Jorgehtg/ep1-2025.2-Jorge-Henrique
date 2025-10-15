@@ -26,7 +26,36 @@ Desenvolvimento de um sistema de gerenciamento hospitalar utilizando os conceito
    [java GerenciamentoHospitalar]
 
 3. **Estrutura de Pastas:**  
-   [Estrutura de Pastas](image.png)
+   ```bash
+   ep1-2025.2-Jorge-Henrique
+   │   README.md
+   │
+   ├───imgs
+   │       Cadastro de medico.png
+   │       Menu principal.png
+   │       Relatorio estatisticas.png
+   │
+   └───Projeto
+      ├───.vscode
+      │       settings.json
+      │
+      └───src
+         │   Consulta.java
+         │   GerenciamentoHospitalar.java
+         │   Internacao.java
+         │   Medico.java
+         │   Paciente.java
+         │   PacienteEspecial.java
+         │   PlanoEspecial.java
+         │   PlanoSaude.java
+         │   Prescricao.java
+         │
+         └───Dados
+                  Consultas.csv
+                  Internacoes.csv
+                  Medicos.csv
+                  Pacientes.csv
+                  Planos.csv
 
 3. **Versão do JAVA utilizada:**  
    [java 17]
